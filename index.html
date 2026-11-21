@@ -1,0 +1,1827 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth"><head><script data-bard-client-injected="true">(function(firebaseConfig, initialAuthToken, appId) {
+        window.__firebase_config = firebaseConfig;
+        window.__initial_auth_token = initialAuthToken;
+        window.__app_id = appId;
+            })("\n{\n  \"apiKey\": \"AIzaSyCqyCcs2R2e7AegGjvFAwG98wlamtbHvZY\",\n  \"authDomain\": \"bard-frontend.firebaseapp.com\",\n  \"projectId\": \"bard-frontend\",\n  \"storageBucket\": \"bard-frontend.firebasestorage.app\",\n  \"messagingSenderId\": \"175205271074\",\n  \"appId\": \"1:175205271074:web:2b7bd4d34d33bf38e6ec7b\"\n}\n","eyJhbGciOiJSUzI1NiIsImtpZCI6IjExNjRiNzdiNDMzZDdhMDAyMWI4NjE4YjhjYTU3ZTMyZGI5MWUxMTMiLCJ0eXAiOiJKV1QifQ.eyJzdWIiOiJmaXJlYmFzZS1hZG1pbnNkay1mYnN2Y0BiYXJkLWZyb250ZW5kLmlhbS5nc2VydmljZWFjY291bnQuY29tIiwiYXVkIjoiaHR0cHM6Ly9pZGVudGl0eXRvb2xraXQuZ29vZ2xlYXBpcy5jb20vZ29vZ2xlLmlkZW50aXR5LmlkZW50aXR5dG9vbGtpdC52MS5JZGVudGl0eVRvb2xraXQiLCJ1aWQiOiIwMzA2MTg3NzU2Mjg3NzcyNzEwOSIsImlzcyI6ImZpcmViYXNlLWFkbWluc2RrLWZic3ZjQGJhcmQtZnJvbnRlbmQuaWFtLmdzZXJ2aWNlYWNjb3VudC5jb20iLCJjbGFpbXMiOnsiYXBwSWQiOiJjXzM0NGEyMWVkM2U4OTJjYzVfYjQ4MWJjMzJfcG9ydGZvbGlvLmh0bWwtNjMzIn0sImV4cCI6MTc5NTIyOTM3NSwiaWF0IjoxNzk1MjI1Nzc1LCJhbGciOiJSUzI1NiJ9.mqKcHav32Fy4dvzWyW_DEQgtgkfTJ5Py91Eh64CQFnJZgYZ_N39DPP911IHgaucTJkfApNsHfH2ahmb1yuZ-NAPIVmfblZCFa6FspfZUMXHx2F5zfbcN8FbUPIcaEndSmHlzBvprstdpcZ-98VPSN0lh-pOklycv6PxqkoSahp4C-WhWfzkczp9z828FL9T9NHY_KD_5LQk32N5JnvzYDu92FH_SI2grG7AqmPCn_TTx99PsA_FrXDlBeQb_G5FnbsLmukFu6rDs-uv0G6QBphFo-k5-fQjNIZlz8blHAUqyqBuOEqj3ZQDnWtHO-ycPe8A5AcZJx1G9tTsQn-T33w","c_344a21ed3e892cc5_b481bc32_portfolio.html-633")</script><script data-bard-client-injected="true">
+  document.addEventListener('input', (event) => {
+    if (event.target && (event.target.isContentEditable || event.target.hasAttribute('contenteditable'))) {
+      const clonedDoc = document.cloneNode(true);
+      const injectedScripts = clonedDoc.querySelectorAll('[data-bard-client-injected="true"]');
+      injectedScripts.forEach(el => el.remove());
+      window.parent.postMessage({
+        type: 'inlineEdit',
+        html: '<!DOCTYPE html>\n' + clonedDoc.documentElement.outerHTML
+      }, '*');
+    }
+  });
+</script><script data-bard-client-injected="true">(function(){'use strict';window.addEventListener("message",a=>{a.data&&a.data.type==="SUPPLEMENTAL_DATA_UPDATE"&&window.dispatchEvent(new CustomEvent("supplementaldataupdate",{detail:a.data.data}))});}).call(this);
+</script><script data-bard-client-injected="true">(function() {
+  const SCROLL_KEYS = new Set([
+    'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
+    ' ', 'Spacebar', 'PageUp', 'PageDown', 'Home', 'End',
+  ]);
+  const HORIZONTAL_KEYS = new Set(['ArrowLeft', 'ArrowRight']);
+
+  function isTextEntryTarget(target) {
+    if (!target) return false;
+    const tagName = target.tagName;
+    return tagName === 'INPUT' || tagName === 'TEXTAREA' ||
+        tagName === 'SELECT' || target.isContentEditable === true;
+  }
+
+  // An element absorbs the key only if it both overflows on the axis being
+  // scrolled and is configured to scroll on that axis. The cheap dimension
+  // test runs first because getComputedStyle forces a style recalc, and this
+  // runs on every keypress. Each axis is read from its own longhand: the
+  // 'overflow' shorthand serializes as two values when the axes differ, which
+  // is the common 'overflow-x: hidden; overflow-y: auto' pane.
+  function canScroll(node, horizontal) {
+    const overflows = horizontal ? node.scrollWidth > node.clientWidth
+                                 : node.scrollHeight > node.clientHeight;
+    if (!overflows) return false;
+    const style = window.getComputedStyle(node);
+    const overflow = horizontal ? style.overflowX : style.overflowY;
+    return overflow === 'auto' || overflow === 'scroll';
+  }
+
+  // Walks up from the event target so nested scrollers keep their behavior.
+  // <body> is included because pages that pin the root height make it the
+  // scroll container.
+  function hasScrollableAncestor(target, horizontal) {
+    let node = target;
+    while (node && node !== document.documentElement) {
+      if (canScroll(node, horizontal)) return true;
+      node = node.parentElement;
+    }
+    return false;
+  }
+
+  function rootCanScroll(horizontal) {
+    const scroller = document.scrollingElement || document.documentElement;
+    if (!scroller) return false;
+    // Tolerate a pixel of rounding so subpixel layouts do not look scrollable.
+    return horizontal ? scroller.scrollWidth > window.innerWidth + 1
+                      : scroller.scrollHeight > window.innerHeight + 1;
+  }
+
+  window.addEventListener('keydown', function(event) {
+    if (!SCROLL_KEYS.has(event.key)) return;
+    if (event.defaultPrevented) return;
+    // Alt and Meta turn arrows into browser history navigation, and Ctrl is
+    // reserved for shortcuts, so none of them are scroll intent.
+    if (event.altKey || event.metaKey || event.ctrlKey) return;
+
+    const target = event.target;
+    if (isTextEntryTarget(target)) return;
+
+    // Anything that can still absorb the scroll gets to keep it.
+    const horizontal = HORIZONTAL_KEYS.has(event.key);
+    if (rootCanScroll(horizontal)) return;
+    if (hasScrollableAncestor(target, horizontal)) return;
+
+    event.preventDefault();
+  }, {capture: true, passive: false});
+})();</script><script data-bard-client-injected="true">(function() {
+  // Ensure this script is executed only once
+  if (window.firebaseAuthBridgeScriptLoaded) {
+    return;
+  }
+  window.firebaseAuthBridgeScriptLoaded = true;
+
+  let nextTokenPromiseId = 0;
+
+  // Stores { resolve, reject } for ongoing token requests
+  const pendingTokenPromises = {};
+
+  // Listen for messages from the Host Application
+  window.addEventListener('message', function(event) {
+
+    const messageData = event.data;
+
+  if (messageData && messageData.type === 'RESOLVE_NEW_FIREBASE_TOKEN') {
+      const { success, token, error, promiseId } = messageData ?? {};
+      if (pendingTokenPromises[promiseId]) {
+        if (success) {
+          pendingTokenPromises[promiseId].resolve(token);
+        } else {
+          pendingTokenPromises[promiseId].reject(new Error(error || 'Token refresh failed from host.'));
+        }
+        delete pendingTokenPromises[promiseId];
+      }
+    }
+  });
+
+  // Expose a function for the Generated App to request a new Firebase token
+  window.requestNewFirebaseToken = function() {
+    const currentPromiseId = nextTokenPromiseId++;
+    const promise = new Promise((resolve, reject) => {
+      pendingTokenPromises[currentPromiseId] = { resolve, reject };
+    });
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({
+        type: 'REQUEST_NEW_FIREBASE_TOKEN',
+        promiseId: currentPromiseId
+      }, '*');
+    } else {
+      pendingTokenPromises[currentPromiseId].reject(new Error('No parent window to request token from.'));
+      delete pendingTokenPromises[currentPromiseId];
+    }
+    return promise;
+  };
+})();</script><script data-bard-client-injected="true">
+let realOriginalGetUserMedia = null;
+if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+  realOriginalGetUserMedia = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+}
+
+(function() {
+  if (navigator.mediaDevices && navigator.mediaDevices.__proto__) {
+    try {
+      Object.defineProperty(navigator.mediaDevices.__proto__, 'getUserMedia', {
+        get: function() {
+          return undefined; // Or throw an error
+        },
+        configurable: false
+      });
+    } catch (error) {
+      console.error("Error defining prototype getter:", error);
+    }
+  }
+})();
+
+(function() {
+  const pendingMediaResolvers = {};
+  let nextMediaPromiseId = 0;
+
+  function requestMediaPermissions(constraints) {
+    const mediaPromiseId = nextMediaPromiseId++;
+    const promise = new Promise((resolve, reject) => {
+      pendingMediaResolvers[mediaPromiseId] = (granted) => {
+        delete pendingMediaResolvers[mediaPromiseId];
+        resolve(granted);
+      };
+    });
+
+    window.parent.postMessage({
+      type: 'requestMediaPermission',
+      constraints: constraints,
+      promiseId: mediaPromiseId,
+    }, '*');
+
+    return promise;
+  }
+
+  let originalGetUserMedia = realOriginalGetUserMedia;
+
+  function interceptGetUserMedia() {
+    if (navigator.mediaDevices) {
+      Object.defineProperty(navigator.mediaDevices, 'getUserMedia', {
+        value: function(constraints) {
+          return requestMediaPermissions(constraints).then((granted) => {
+            if (granted) {
+              if (originalGetUserMedia) {
+                return originalGetUserMedia(constraints);
+              } else {
+                throw new Error("Original getUserMedia not available.");
+              }
+            } else {
+              throw new DOMException('Permission denied', 'NotAllowedError');
+            }
+          });
+        },
+        writable: false,
+        configurable: false
+      });
+    }
+  }
+
+  interceptGetUserMedia();
+
+  const observer = new MutationObserver(function(mutationsList, observer) {
+    for (const mutation of mutationsList) {
+      if (mutation.type === 'reconfigured' && mutation.name === 'getUserMedia' && mutation.object === navigator.mediaDevices) {
+        interceptGetUserMedia();
+      } else if (mutation.type === 'attributes' && mutation.attributeName === 'getUserMedia' && mutation.target === navigator.mediaDevices) {
+        interceptGetUserMedia();
+      } else if (mutation.type === 'childList' && mutation.addedNodes) {
+        mutation.addedNodes.forEach(node => {
+          if (node === navigator.mediaDevices) {
+            interceptGetUserMedia();
+          }
+        });
+      }
+    }
+  });
+
+  function interceptSpeechRecognition() {
+    if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
+      return;
+    }
+
+    const OriginalSpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    const SpeechRecognitionWrapper = function(...args) {
+      const recognizer = new OriginalSpeechRecognition(...args);
+      const originalStart = recognizer.start.bind(recognizer);
+
+      recognizer.start = function() {
+        requestMediaPermissions({ audio: true }).then(granted => {
+          if (granted) {
+            originalStart();
+          } else {
+            const errorEvent = new SpeechRecognitionErrorEvent('error');
+            errorEvent.error = 'not-allowed'; // This is the standard error for permission denial.
+            recognizer.dispatchEvent(errorEvent);
+          }
+        });
+      };
+
+      return recognizer;
+    };
+
+    SpeechRecognitionWrapper.prototype = OriginalSpeechRecognition.prototype;
+    SpeechRecognitionWrapper.prototype.constructor = SpeechRecognitionWrapper;
+
+    if (window.SpeechRecognition) {
+      window.SpeechRecognition = SpeechRecognitionWrapper;
+    }
+    if (window.webkitSpeechRecognition) {
+      window.webkitSpeechRecognition = SpeechRecognitionWrapper;
+    }
+  }
+
+  interceptSpeechRecognition();
+
+  window.addEventListener('message', function(event) {
+    if (event.data) {
+      if (event.data.type === 'resolveMediaPermission') {
+        const { promiseId, granted } = event.data;
+        if (pendingMediaResolvers[promiseId]) {
+          pendingMediaResolvers[promiseId](granted);
+        }
+      }
+    }
+  });
+
+})();</script><script ws-interception-config="{&quot;parentOrigin&quot;:&quot;https://gemini.google.com&quot;,&quot;proxiedDomains&quot;:[]}" data-bard-client-injected="true">(function(){'use strict';var u=typeof Object.defineProperties=="function"?Object.defineProperty:function(b,d,e){if(b==Array.prototype||b==Object.prototype)return b;b[d]=e.value;return b};function v(b){b=["object"==typeof globalThis&&globalThis,b,"object"==typeof window&&window,"object"==typeof self&&self,"object"==typeof global&&global];for(var d=0;d<b.length;++d){var e=b[d];if(e&&e.Math==Math)return e}throw Error("Cannot find global object");}var w=v(this);
+function y(b,d){if(d)a:{var e=w;b=b.split(".");for(var h=0;h<b.length-1;h++){var k=b[h];if(!(k in e))break a;e=e[k]}b=b[b.length-1];h=e[b];d=d(h);d!=h&&d!=null&&u(e,b,{configurable:!0,writable:!0,value:d})}}function z(b){function d(h){return b.next(h)}function e(h){return b.throw(h)}return new Promise(function(h,k){function m(n){n.done?h(n.value):Promise.resolve(n.value).then(d,e).then(m,k)}m(b.next())})}y("globalThis",function(b){return b||w});/*
+
+ Copyright The Closure Library Authors.
+ SPDX-License-Identifier: Apache-2.0
+*/
+function A(b,d){function e(){}e.prototype=d.prototype;b.i=d.prototype;b.prototype=new e;b.prototype.constructor=b;b.h=function(h,k,m){for(var n=Array(arguments.length-2),p=2;p<arguments.length;p++)n[p-2]=arguments[p];return d.prototype[k].apply(h,n)}};function B(b,d,e="*"){function h(a){if(typeof a==="string")return F.encode(a).buffer;if(a instanceof ArrayBuffer)return a.slice(0);if(ArrayBuffer.isView(a))return a.buffer.slice(a.byteOffset,a.byteOffset+a.byteLength);throw Error("Invalid data type");}function k(a){a=h(a);var f={type:"send",data:new Uint8Array(a)},g;(g=r)==null||g.postMessage(f,[a])}function m(){if(!r)throw Error("Data port not captured yet.");r.onmessage=a=>{if(a.data.type==="message"){a=new MessageEvent("message",{data:G.decode(a.data.data)});
+let f;(f=c.onmessage)==null||f.call(c,a);c.dispatchEvent(a)}}}function n(){if(!t)throw Error("Control port not captured yet.");t.onmessage=a=>{switch(a.data.type){case "open":l=1;var f=new Event("open"),g;(g=c.onopen)==null||g.call(c,f);c.dispatchEvent(f);q.forEach(H=>{k(H)});q=[];break;case "close":g=a.data;l=3;g=new CloseEvent("close",{code:g.code,reason:g.reason,wasClean:g.wasClean});(f=c.onclose)==null||f.call(c,g);c.dispatchEvent(g);break;case "error":l=3;f=new Event("error");let x;(x=c.onerror)==
+null||x.call(c,f);c.dispatchEvent(f)}}}function p(a){return z(function*(){var f=new MessageChannel;t=f.port1;var g=new MessageChannel;r=g.port1;n();m();window.parent.postMessage({type:"websocket_open",portOrdering:["control","data"],url:b,protocols:a||[],connectionId:I},e,[f.port2,g.port2])}())}var c=Reflect.construct(EventTarget,[],new.target);c.CONNECTING=0;c.OPEN=1;c.CLOSING=2;c.CLOSED=3;c.url=b;c.binaryType="arraybuffer";c.protocol="";c.extensions="";var l=0,t=null,r=null,q=[],F=new TextEncoder,
+G=new TextDecoder;c.onopen=null;c.onmessage=null;c.onclose=null;c.onerror=null;Object.defineProperty(c,"readyState",{get:()=>l,enumerable:!0,configurable:!0});Object.defineProperty(c,"bufferedAmount",{get:()=>{var a=0;q.forEach(f=>{a+=typeof f==="string"?f.length:f.byteLength});return a},enumerable:!0,configurable:!0});var I=function(){var a;return((a=globalThis.crypto)==null?0:a.randomUUID)?globalThis.crypto.randomUUID():"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,f=>{var g=Math.random()*
+16|0;return(f==="x"?g:g&3|8).toString(16)})}();c.send=a=>{if(l===1)a instanceof Blob?a.arrayBuffer().then(f=>{k(f)}):k(a);else if(l===0)if(typeof a==="string")q.push(a);else if(a instanceof ArrayBuffer||ArrayBuffer.isView(a))q.push(h(a));else throw Error("Sending Blob is not supported before the connection is open.");else console.debug("WebSocket send called in CLOSING or CLOSED state; ignored.")};c.close=(a=1E3,f="")=>{if(l!==2&&l!==3){l=2;a={type:"close",code:a,reason:f,wasClean:a===1E3};var g;
+(g=t)==null||g.postMessage(a)}};Promise.resolve().then(()=>p(d));return c}A(B,EventTarget);var C=document.currentScript,D=C==null?void 0:C.getAttribute("ws-interception-config");if(!D)throw Error("WebSocket Interceptor: Missing ws-interception-config attribute in the script tag.");var E=JSON.parse(D);if(!E.parentOrigin||typeof E.parentOrigin!=="string")throw Error("WebSocket Interceptor: Invalid parentOrigin in ws-interception-config");
+(function(b){var d=Object.getOwnPropertyDescriptor(window,"WebSocket");if(!d||d.writable||d.configurable)d=Object.assign(function(e,h){try{let k=(new URL(e)).hostname;if(b.proxiedDomains.some(m=>k===m||k.endsWith(`.${m}`)))return new B(e,h,b.parentOrigin)}catch(k){throw window.parent.postMessage({type:"websocket_blocked",url:e,reason:"blocked_invalid_url"},b.parentOrigin),new DOMException(`WebSocket connection to '${e}' is not allowed in Canvas.`,"SecurityError");}window.parent.postMessage({type:"websocket_blocked",
+url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMException(`WebSocket connection to '${e}' is not allowed in Canvas.`,"SecurityError");},{CONNECTING:0,OPEN:1,CLOSING:2,CLOSED:3}),Object.defineProperty(window,"WebSocket",{value:d,writable:!1,configurable:!1})})({proxiedDomains:E.proxiedDomains||[],parentOrigin:E.parentOrigin});}).call(this);
+</script><script data-bard-client-injected="true">((function(modelInformation) {
+  const originalFetch = window.fetch;
+  // TODO: b/421908508 - Move these out of the script and match all generative AI model calls.
+  let googleLlmBaseApiUrls = [
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.textModelName + ':streamGenerateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.textModelName + ':generateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageModelName + ':predict',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageModelName + ':predictLongRunning',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageEditModelName + ':generateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageTransformModelName + ':generateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.videoModelName + ':predict',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.videoModelName + ':predictLongRunning',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.ttsModelName + ':generateContent',
+  ];
+  modelInformation.deprecatedTextModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+    );
+  });
+  modelInformation.deprecatedImageModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':predict',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':predictLongRunning',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+    );
+  });
+  modelInformation.deprecatedGenerateImageModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+    );
+  });
+  modelInformation.deprecatedImageTransformModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+    );
+  });
+
+  const pendingFetchResolvers = {};
+  let nextPromiseId = 0;
+
+  function handleStringInput(input, optionsArgument) {
+    const actualUrl = input;
+    const fetchCallArgs = [actualUrl, optionsArgument];
+    const effectiveOptions = optionsArgument || {};
+    const bodyForApiKeyCheck = effectiveOptions.body;
+    const bodyForPostMessage = effectiveOptions.body;
+    return { actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage };
+  }
+
+  function handleRequestInput(input, optionsArgument) {
+    const actualUrl = input.url;
+    const fetchCallArgs = [input, optionsArgument];
+    const effectiveOptions = { method: input.method, headers: new Headers(input.headers) };
+    let bodyForApiKeyCheck;
+    let bodyForPostMessage;
+
+    if (optionsArgument) {
+      if (optionsArgument.method) effectiveOptions.method = optionsArgument.method;
+      if (optionsArgument.headers) effectiveOptions.headers = new Headers(optionsArgument.headers);
+      if ('body' in optionsArgument) {
+        bodyForApiKeyCheck = optionsArgument.body;
+        bodyForPostMessage = optionsArgument.body;
+      } else {
+        bodyForApiKeyCheck = undefined;
+        bodyForPostMessage = input.body;
+      }
+    } else {
+      bodyForApiKeyCheck = undefined;
+      bodyForPostMessage = input.body;
+    }
+    return { actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage };
+  }
+
+  window.fetch = function(input, optionsArgument) {
+    let actualUrl;
+    let fetchCallArgs;
+    let effectiveOptions = {};
+    let bodyForApiKeyCheck;
+    let bodyForPostMessage;
+
+    if (typeof input === 'string') {
+      ({actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage} = handleStringInput(input, optionsArgument));
+    } else if (input instanceof Request) {
+      ({actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage} = handleRequestInput(input, optionsArgument));
+    } else {
+      return originalFetch.apply(window, [input, optionsArgument]);
+    }
+
+    effectiveOptions.method = effectiveOptions.method || 'GET';
+    if (!effectiveOptions.headers) {
+      effectiveOptions.headers = new Headers();
+    }
+
+
+    if (typeof actualUrl === 'string' && googleLlmBaseApiUrls.some((url) => actualUrl.startsWith(url))) {
+      let apiKeyIsNull = true;
+
+      const regex = new RegExp("models/([^:]+)");
+      const modelNameMatch = actualUrl.match(regex);
+      const modelName = modelNameMatch ? modelNameMatch[1] : 'unspecified';
+
+
+      try {
+        const urlObject = new URL(actualUrl);  // Use URL object for robust parsing
+        const apiKeyParam = urlObject.searchParams.get('key');
+        if (apiKeyParam) {
+          apiKeyIsNull = false;
+        }
+      } catch (e) {
+        // Continue checks even if URL parsing fails
+      }
+
+      if (apiKeyIsNull && effectiveOptions.headers) {
+        const h = new Headers(effectiveOptions.headers);
+        const apiKeyHeaderValue = h.get('X-API-Key') || h.get('x-api-key');
+        if (apiKeyHeaderValue) {
+          apiKeyIsNull = false;
+          return originalFetch.apply(window, fetchCallArgs);
+        }
+      }
+
+      if (apiKeyIsNull && effectiveOptions.method && ['POST', 'PUT', 'PATCH'].includes(effectiveOptions.method.toUpperCase()) && typeof bodyForApiKeyCheck === 'string') {
+        try {
+          const bodyData = JSON.parse(bodyForApiKeyCheck);
+          if (bodyData && bodyData.apiKey) {
+            apiKeyIsNull = false;
+            return originalFetch.apply(window, fetchCallArgs);
+          }
+        } catch (e) {
+          // Ignore JSON parsing errors
+        }
+      }
+
+      if(apiKeyIsNull) {
+        const promiseId = nextPromiseId++;
+        const promise = new Promise((resolve) => {
+          pendingFetchResolvers[promiseId] = (resolvedResponse) => {
+            delete pendingFetchResolvers[promiseId];
+            resolve(resolvedResponse);
+          };
+        });
+
+        let serializedBodyForPostMessage;
+        if (typeof bodyForPostMessage === 'string' || bodyForPostMessage == null) {
+            serializedBodyForPostMessage = bodyForPostMessage;
+        } else if (bodyForPostMessage instanceof ReadableStream) {
+            serializedBodyForPostMessage = null;
+        } else {
+            try {
+                serializedBodyForPostMessage = JSON.stringify(bodyForPostMessage);
+            } catch (e) {
+                serializedBodyForPostMessage = null;
+            }
+        }
+
+        const messageOptions = {
+            method: effectiveOptions.method,
+            headers: Object.fromEntries(new Headers(effectiveOptions.headers).entries()),
+            body: serializedBodyForPostMessage
+        };
+
+        window.parent.postMessage({
+          type: 'requestFetch',
+          url: actualUrl,
+          modelName: modelName,
+          options: messageOptions,
+          promiseId: promiseId,
+        }, '*');
+
+        return promise;
+      }
+      return originalFetch.apply(window, fetchCallArgs);
+    }
+    return originalFetch.apply(window, fetchCallArgs);
+  };
+
+  window.addEventListener('message', function(event) {
+    if (event.data && event.data.type === 'resolveFetch') {
+      const { promiseId, response } = event.data;
+      if (pendingFetchResolvers[promiseId]) {
+        try {
+          const reconstructedResponse = new Response(response.body, {
+            status: response.status,
+            statusText: response.statusText,
+            headers: new Headers(response.headers),
+          });
+          pendingFetchResolvers[promiseId](reconstructedResponse);
+        } catch (error) {
+          pendingFetchResolvers[promiseId](new Response(null, { status: 500, statusText: "Interceptor Response Reconstruction Error" }));
+        }
+      }
+    }
+  });
+
+}))({"textModelName":"gemini-3-flash-preview","imageModelName":"imagen-4.0-generate-001","imageEditModelName":"gemini-3.1-flash-image","imageTransformModelName":"gemini-3-pro-image","videoModelName":"veo-2.0-generate-001","ttsModelName":"gemini-2.5-flash-preview-tts","deprecatedTextModelNames":["gemini-2.0-flash","gemini-2.5-flash","gemini-2.5-flash-preview-04-17","gemini-2.5-flash-preview-05-20","gemini-2.5-flash-preview-09-2025"],"deprecatedImageModelNames":["imagen-3.0-generate-001","imagen-3.0-generate-002"],"deprecatedGenerateImageModelNames":["gemini-2.5-flash-image-preview","gemini-2.5-flash-image","gemini-3.1-flash-image-preview"],"deprecatedImageTransformModelNames":["gemini-3-pro-image-preview-11-2025"]})</script><script data-bard-client-injected="true">(function() {
+  const OVERLAY_SELECTOR =
+    'dialog[open], [role="dialog"], [role="alertdialog"], [role="menu"], [role="listbox"], [role="combobox"]';
+
+  function isVisibleOverlay(element) {
+    if (element.closest('[hidden], [aria-hidden="true"], [inert]')) {
+      return false;
+    }
+    if (window.getComputedStyle(element).visibility === 'hidden') {
+      return false;
+    }
+    for (let cur = element; cur; cur = cur.parentElement) {
+      if (window.getComputedStyle(cur).display === 'none') {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  function hasOpenOverlay() {
+    const candidates = document.querySelectorAll(OVERLAY_SELECTOR);
+    for (let i = 0; i < candidates.length; i++) {
+      if (isVisibleOverlay(candidates[i])) {
+        return true;
+      }
+    }
+    try {
+      if (document.querySelector('[popover]:popover-open')) {
+        return true;
+      }
+    } catch (e) {
+      // Ignore engines that do not support :popover-open.
+    }
+    return false;
+  }
+
+  function isNonEmptySearchInput(target) {
+    return (
+      Boolean(target) &&
+      target.tagName === 'INPUT' &&
+      typeof target.type === 'string' &&
+      target.type.toLowerCase() === 'search' &&
+      typeof target.value === 'string' &&
+      target.value.length > 0
+    );
+  }
+
+  function shouldIgnoreEscape(event) {
+    return (
+      event.key !== 'Escape' ||
+      event.altKey ||
+      event.ctrlKey ||
+      event.metaKey ||
+      event.shiftKey ||
+      event.isComposing ||
+      event.repeat ||
+      event.keyCode === 229 ||
+      isNonEmptySearchInput(event.target)
+    );
+  }
+
+  let shouldIgnoreCaptureState = false;
+
+  window.addEventListener(
+    'keydown',
+    function(event) {
+      if (event.key === 'Escape') {
+        shouldIgnoreCaptureState =
+          hasOpenOverlay() || isNonEmptySearchInput(event.target);
+      }
+    },
+    {capture: true},
+  );
+
+  window.addEventListener('keydown', function(event) {
+    if (
+      shouldIgnoreEscape(event) ||
+      event.defaultPrevented ||
+      shouldIgnoreCaptureState
+    ) {
+      return;
+    }
+    const wasBlockedOnCapture = shouldIgnoreCaptureState;
+    queueMicrotask(function() {
+      if (event.defaultPrevented || wasBlockedOnCapture) {
+        return;
+      }
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage({'type': 'escapeKey'}, '*');
+      }
+    });
+  });
+})();</script><script data-bard-client-injected="true">(function() {
+  function normalizeSlug(str) {
+    try {
+      return str
+        .trim()
+        .toLowerCase()
+        .replace(/[^p{L}p{N}s_-]/gu, '')
+        .replace(/s+/g, '-');
+    } catch (e) {
+      return str
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9s_-]/g, '')
+        .replace(/s+/g, '-');
+    }
+  }
+
+  function findTargetElement(hash) {
+    if (!hash || hash === '#') {
+      return null;
+    }
+    const rawId = hash.startsWith('#') ? hash.slice(1) : hash;
+    let decodedId = rawId;
+    try {
+      decodedId = decodeURIComponent(rawId);
+    } catch (e) {
+      // Ignore URI malformed errors.
+    }
+
+    // 1. Direct ID match (raw and decoded).
+    let target = document.getElementById(rawId) || document.getElementById(decodedId);
+    if (target) {
+      return target;
+    }
+
+    // 2. Name attribute match (<a name="...">).
+    try {
+      if (typeof CSS !== 'undefined' && CSS.escape) {
+        target =
+          document.querySelector('[name="' + CSS.escape(rawId) + '"]') ||
+          document.querySelector('[name="' + CSS.escape(decodedId) + '"]');
+      } else {
+        const namedElements = document.getElementsByName(rawId);
+        if (namedElements && namedElements.length > 0) {
+          return namedElements[0];
+        }
+      }
+    } catch (e) {
+      // Ignore querySelector syntax errors.
+    }
+    if (target) {
+      return target;
+    }
+
+    // 3. Match heading text by slug (for Markdown TOCs where headings lack explicit IDs).
+    const targetSlug = normalizeSlug(decodedId);
+    if (targetSlug) {
+      for (const heading of document.querySelectorAll('h1, h2, h3, h4, h5, h6')) {
+        if (normalizeSlug(heading.textContent || '') === targetSlug) {
+          return heading;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  document.addEventListener('click', function(event) {
+    const target = event.target;
+    const anchor = target && typeof target.closest === 'function' ? target.closest('a') : null;
+    if (!anchor) {
+      return;
+    }
+
+    const href = anchor.getAttribute('href');
+    if (
+      !href ||
+      href.trim().toLowerCase().startsWith('javascript:') ||
+      anchor.hasAttribute('download')
+    ) {
+      return;
+    }
+
+    // Check if the link is an in-page hash / anchor link.
+    if (href.startsWith('#')) {
+      event.preventDefault();
+      const targetElement = findTargetElement(href);
+      if (targetElement) {
+        targetElement.scrollIntoView({behavior: 'smooth', block: 'start'});
+      }
+      return;
+    }
+
+    // Check if the URL has the same origin/pathname but with a hash.
+    try {
+      const url = new URL(anchor.href, window.location.href);
+      if (
+        url.hash &&
+        url.origin === window.location.origin &&
+        url.pathname === window.location.pathname
+      ) {
+        event.preventDefault();
+        const targetElement = findTargetElement(url.hash);
+        if (targetElement) {
+          targetElement.scrollIntoView({behavior: 'smooth', block: 'start'});
+        }
+        return;
+      }
+    } catch (e) {
+      // Fall through if URL parsing fails.
+    }
+
+    // For all external or full navigation links, prevent iframe-level navigation
+    // (which breaks in AGSA WebView or sandboxed iframes) and ensure they open
+    // safely in a new tab/window.
+    if (anchor.target !== '_blank') {
+      event.preventDefault();
+      window.open(anchor.href, '_blank', 'noopener,noreferrer');
+    }
+  }, {capture: true});
+})();</script><script data-bard-client-injected="true">(function(){'use strict';function a(){window.parent.postMessage({type:"interaction"},"*")}window.addEventListener("click",a,{capture:!0,passive:!0});window.addEventListener("touchstart",a,{capture:!0,passive:!0});window.addEventListener("keydown",a,{capture:!0,passive:!0});}).call(this);
+</script><script data-bard-client-injected="true">(function() {
+  const originalConsoleLog = console.log;
+  const originalConsoleError = console.error;
+
+    /**
+   * Normalizes an error event or a promise rejection reason into a structured error object.
+   * @param {*} errorEventOrReason The error object or reason.
+   * @return {object} Structured error data { message, name, stack }.
+   */
+  function getErrorObject(errorEventOrReason) {
+    if (errorEventOrReason instanceof Error) {
+      return {
+        message: errorEventOrReason.message,
+        name: errorEventOrReason.name,
+        stack: errorEventOrReason.stack,
+      };
+    }
+    // Fallback for non-Error objects.
+    try {
+      return {
+        message: JSON.stringify(errorEventOrReason),
+        name: 'UnknownErrorType',
+        stack: null,
+      };
+    } catch (e) {
+      return {
+        message: String(errorEventOrReason),
+        name: 'UnknownErrorTypeNonStringifiable',
+        stack: null,
+      };
+    }
+  }
+
+  /**
+   * Converts an array of arguments (from log/error) into a single string.
+   * Handles Error objects specially to include their message and stack.
+   * @param {Array<*>} args - Arguments passed to console methods.
+   * @return {string} A string representation of the arguments.
+   */
+  function stringifyArgs(args) {
+    return args
+      .map((arg) => {
+        if (arg instanceof Error) {
+          const {message, stack} = arg;
+          return `Error: ${message}${stack ? ('\nStack: ' + stack) : ''}`;
+        }
+        if (typeof arg === 'object' && arg !== null) {
+          try {
+            return JSON.stringify(arg);
+          } catch (error) {
+            return '[Circular Object]';
+          }
+        } else {
+          return String(arg);
+        }
+      })
+      .join(' ');
+  }
+
+  console.log = function(...args) {
+    const logString = stringifyArgs(args);
+    window.parent.postMessage({ type: 'log', message: logString }, '*');
+    originalConsoleLog.apply(console, args);
+  };
+
+  console.error = function(...args) {
+    let errorData;
+    if (args.length > 0 && args[0] instanceof Error) {
+      const err = args[0];
+      // If the first arg is an Error, capture its details.
+      errorData = {
+        type: 'error',
+        source: 'CONSOLE_ERROR',
+        ...getErrorObject(err),
+        rawArgsString: stringifyArgs(args.slice(1)),
+        timestamp: new Date().toISOString(),
+      };
+    } else {
+      // If not an Error object, treat all args as a general error message.
+      errorData = {
+        type: 'error',
+        source: 'CONSOLE_ERROR',
+        message: stringifyArgs(args),
+        name: 'ConsoleLoggedError',
+        stack: null,
+        timestamp: new Date().toISOString(),
+      };
+    }
+    window.parent.postMessage(errorData, '*');
+    originalConsoleError.apply(console, args);
+  };
+
+  // Listen for global unhandled synchronous errors.
+  window.addEventListener('error', function(event) {
+    const errorDetails = event.error ? getErrorObject(event.error) : {
+      message: event.message,
+      name: 'GlobalError',
+      stack: null,
+      filename: event.filename,
+      lineno: event.lineno,
+      colno: event.colno,
+    };
+
+    window.parent.postMessage({
+      type: 'error',
+      source: 'global',
+      ...errorDetails,
+      message: errorDetails.message || event.message,
+      timestamp: new Date().toISOString(),
+    }, '*');
+  });
+
+  // Listen for unhandled promise rejections (asynchronous errors).
+  window.addEventListener('unhandledrejection', function(event) {
+    const errorDetails = getErrorObject(event.reason);
+
+    window.parent.postMessage({
+      type: 'error',
+      source: 'unhandledrejection',
+      ...errorDetails,
+      message: errorDetails.message || 'Unhandled Promise Rejection',
+      timestamp: new Date().toISOString(),
+    }, '*');
+  });
+
+})();</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yassin Mohamed — Software Engineer · Backend &amp; Full-Stack</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+          },
+        }
+      }
+    };
+  </script>
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .fade-in { animation: fadeIn 0.3s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    .bg-dot-pattern {
+      background-image: radial-gradient(rgba(148, 163, 184, 0.14) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+    html:not(.dark) .bg-dot-pattern {
+      background-image: radial-gradient(rgba(15, 23, 42, 0.08) 1px, transparent 1px);
+    }
+    @media print {
+      .no-print { display: none !important; }
+      body { background: #fff !important; color: #111 !important; }
+    }
+  </style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:Inter, system-ui, sans-serif;font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:JetBrains Mono, ui-monospace, monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.pointer-events-none{pointer-events:none}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.sticky{position:sticky}.inset-0{inset:0px}.inset-x-0{left:0px;right:0px}.bottom-5{bottom:1.25rem}.right-5{right:1.25rem}.top-0{top:0px}.left-\[9px\]{left:9px}.top-6{top:1.5rem}.z-40{z-index:40}.z-50{z-index:50}.mx-auto{margin-left:auto;margin-right:auto}.mb-1{margin-bottom:0.25rem}.mt-0\.5{margin-top:0.125rem}.mt-1{margin-top:0.25rem}.mt-2{margin-top:0.5rem}.mt-1\.5{margin-top:0.375rem}.block{display:block}.flex{display:flex}.inline-flex{display:inline-flex}.grid{display:grid}.hidden{display:none}.h-16{height:4rem}.h-2{height:0.5rem}.h-3\.5{height:0.875rem}.h-4{height:1rem}.h-5{height:1.25rem}.h-8{height:2rem}.h-\[420px\]{height:420px}.h-full{height:100%}.h-28{height:7rem}.w-2{width:0.5rem}.w-3\.5{width:0.875rem}.w-4{width:1rem}.w-5{width:1.25rem}.w-8{width:2rem}.w-full{width:100%}.max-w-3xl{max-width:48rem}.max-w-5xl{max-width:64rem}.max-w-lg{max-width:32rem}.max-w-md{max-width:28rem}.max-w-xl{max-width:36rem}.flex-1{flex:1 1 0%}.shrink-0{flex-shrink:0}@keyframes pulse{50%{opacity:.5}}.animate-pulse{animation:pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite}.cursor-pointer{cursor:pointer}.scroll-mt-24{scroll-margin-top:6rem}.list-disc{list-style-type:disc}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-start{align-items:flex-start}.items-center{align-items:center}.justify-end{justify-content:flex-end}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-1\.5{gap:0.375rem}.gap-2{gap:0.5rem}.gap-2\.5{gap:0.625rem}.gap-3{gap:0.75rem}.gap-4{gap:1rem}.gap-5{gap:1.25rem}.gap-6{gap:1.5rem}.space-y-2 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.5rem * var(--tw-space-y-reverse))}.space-y-24 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(6rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(6rem * var(--tw-space-y-reverse))}.space-y-3 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.75rem * var(--tw-space-y-reverse))}.space-y-4 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.space-y-5 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1.25rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1.25rem * var(--tw-space-y-reverse))}.space-y-6 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1.5rem * var(--tw-space-y-reverse))}.space-y-7 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1.75rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1.75rem * var(--tw-space-y-reverse))}.space-y-1\.5 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.375rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.375rem * var(--tw-space-y-reverse))}.self-start{align-self:flex-start}.overflow-hidden{overflow:hidden}.overflow-y-auto{overflow-y:auto}.scroll-smooth{scroll-behavior:smooth}.rounded-2xl{border-radius:1rem}.rounded-3xl{border-radius:1.5rem}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.rounded-md{border-radius:0.375rem}.rounded-xl{border-radius:0.75rem}.border{border-width:1px}.border-2{border-width:2px}.border-b{border-bottom-width:1px}.border-l{border-left-width:1px}.border-t{border-top-width:1px}.border-emerald-500\/25{border-color:rgb(16 185 129 / 0.25)}.border-indigo-400\/30{border-color:rgb(129 140 248 / 0.3)}.border-slate-200{--tw-border-opacity:1;border-color:rgb(226 232 240 / var(--tw-border-opacity, 1))}.border-slate-200\/70{border-color:rgb(226 232 240 / 0.7)}.border-slate-200\/80{border-color:rgb(226 232 240 / 0.8)}.border-slate-200\/90{border-color:rgb(226 232 240 / 0.9)}.border-slate-300{--tw-border-opacity:1;border-color:rgb(203 213 225 / var(--tw-border-opacity, 1))}.border-slate-800{--tw-border-opacity:1;border-color:rgb(30 41 59 / var(--tw-border-opacity, 1))}.border-white\/\[0\.1\]{border-color:rgb(255 255 255 / 0.1)}.border-amber-500\/20{border-color:rgb(245 158 11 / 0.2)}.border-cyan-500\/20{border-color:rgb(6 182 212 / 0.2)}.border-emerald-500\/20{border-color:rgb(16 185 129 / 0.2)}.border-indigo-300\/60{border-color:rgb(165 180 252 / 0.6)}.border-indigo-500\/20{border-color:rgb(99 102 241 / 0.2)}.border-slate-100{--tw-border-opacity:1;border-color:rgb(241 245 249 / var(--tw-border-opacity, 1))}.border-slate-400{--tw-border-opacity:1;border-color:rgb(148 163 184 / var(--tw-border-opacity, 1))}.bg-black\/60{background-color:rgb(0 0 0 / 0.6)}.bg-black\/70{background-color:rgb(0 0 0 / 0.7)}.bg-emerald-400{--tw-bg-opacity:1;background-color:rgb(52 211 153 / var(--tw-bg-opacity, 1))}.bg-emerald-500\/10{background-color:rgb(16 185 129 / 0.1)}.bg-indigo-500\/15{background-color:rgb(99 102 241 / 0.15)}.bg-indigo-600{--tw-bg-opacity:1;background-color:rgb(79 70 229 / var(--tw-bg-opacity, 1))}.bg-slate-100{--tw-bg-opacity:1;background-color:rgb(241 245 249 / var(--tw-bg-opacity, 1))}.bg-slate-50{--tw-bg-opacity:1;background-color:rgb(248 250 252 / var(--tw-bg-opacity, 1))}.bg-slate-50\/80{background-color:rgb(248 250 252 / 0.8)}.bg-slate-50\/85{background-color:rgb(248 250 252 / 0.85)}.bg-slate-900{--tw-bg-opacity:1;background-color:rgb(15 23 42 / var(--tw-bg-opacity, 1))}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-white\/60{background-color:rgb(255 255 255 / 0.6)}.bg-white\/70{background-color:rgb(255 255 255 / 0.7)}.bg-white\/80{background-color:rgb(255 255 255 / 0.8)}.bg-white\/\[0\.06\]{background-color:rgb(255 255 255 / 0.06)}.bg-\[\#0B0F17\]{--tw-bg-opacity:1;background-color:rgb(11 15 23 / var(--tw-bg-opacity, 1))}.bg-amber-500\/\[0\.06\]{background-color:rgb(245 158 11 / 0.06)}.bg-cyan-500\/\[0\.06\]{background-color:rgb(6 182 212 / 0.06)}.bg-emerald-500\/\[0\.06\]{background-color:rgb(16 185 129 / 0.06)}.bg-indigo-500{--tw-bg-opacity:1;background-color:rgb(99 102 241 / var(--tw-bg-opacity, 1))}.bg-indigo-500\/\[0\.06\]{background-color:rgb(99 102 241 / 0.06)}.p-1\.5{padding:0.375rem}.p-2{padding:0.5rem}.p-2\.5{padding:0.625rem}.p-3\.5{padding:0.875rem}.p-4{padding:1rem}.p-5{padding:1.25rem}.p-6{padding:1.5rem}.px-2\.5{padding-left:0.625rem;padding-right:0.625rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.px-4{padding-left:1rem;padding-right:1rem}.px-5{padding-left:1.25rem;padding-right:1.25rem}.py-1{padding-top:0.25rem;padding-bottom:0.25rem}.py-1\.5{padding-top:0.375rem;padding-bottom:0.375rem}.py-12{padding-top:3rem;padding-bottom:3rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-2\.5{padding-top:0.625rem;padding-bottom:0.625rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.py-8{padding-top:2rem;padding-bottom:2rem}.px-2{padding-left:0.5rem;padding-right:0.5rem}.py-0\.5{padding-top:0.125rem;padding-bottom:0.125rem}.pt-1{padding-top:0.25rem}.pt-3{padding-top:0.75rem}.pb-2{padding-bottom:0.5rem}.pl-5{padding-left:1.25rem}.text-center{text-align:center}.font-mono{font-family:JetBrains Mono, ui-monospace, monospace}.text-2xl{font-size:1.5rem;line-height:2rem}.text-3xl{font-size:1.875rem;line-height:2.25rem}.text-\[11px\]{font-size:11px}.text-base{font-size:1rem;line-height:1.5rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-xs{font-size:0.75rem;line-height:1rem}.font-bold{font-weight:700}.font-medium{font-weight:500}.font-normal{font-weight:400}.font-semibold{font-weight:600}.uppercase{text-transform:uppercase}.leading-\[1\.15\]{line-height:1.15}.leading-relaxed{line-height:1.625}.tracking-normal{letter-spacing:0em}.tracking-tight{letter-spacing:-0.025em}.tracking-wider{letter-spacing:0.05em}.text-emerald-600{--tw-text-opacity:1;color:rgb(5 150 105 / var(--tw-text-opacity, 1))}.text-emerald-700{--tw-text-opacity:1;color:rgb(4 120 87 / var(--tw-text-opacity, 1))}.text-indigo-400{--tw-text-opacity:1;color:rgb(129 140 248 / var(--tw-text-opacity, 1))}.text-indigo-600{--tw-text-opacity:1;color:rgb(79 70 229 / var(--tw-text-opacity, 1))}.text-slate-100{--tw-text-opacity:1;color:rgb(241 245 249 / var(--tw-text-opacity, 1))}.text-slate-300{--tw-text-opacity:1;color:rgb(203 213 225 / var(--tw-text-opacity, 1))}.text-slate-400{--tw-text-opacity:1;color:rgb(148 163 184 / var(--tw-text-opacity, 1))}.text-slate-50{--tw-text-opacity:1;color:rgb(248 250 252 / var(--tw-text-opacity, 1))}.text-slate-500{--tw-text-opacity:1;color:rgb(100 116 139 / var(--tw-text-opacity, 1))}.text-slate-600{--tw-text-opacity:1;color:rgb(71 85 105 / var(--tw-text-opacity, 1))}.text-slate-700{--tw-text-opacity:1;color:rgb(51 65 85 / var(--tw-text-opacity, 1))}.text-slate-800{--tw-text-opacity:1;color:rgb(30 41 59 / var(--tw-text-opacity, 1))}.text-slate-900{--tw-text-opacity:1;color:rgb(15 23 42 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.text-amber-400{--tw-text-opacity:1;color:rgb(251 191 36 / var(--tw-text-opacity, 1))}.text-cyan-400{--tw-text-opacity:1;color:rgb(34 211 238 / var(--tw-text-opacity, 1))}.text-emerald-400{--tw-text-opacity:1;color:rgb(52 211 153 / var(--tw-text-opacity, 1))}.antialiased{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.opacity-75{opacity:0.75}.opacity-90{opacity:0.9}.shadow-2xl{--tw-shadow:0 25px 50px -12px rgb(0 0 0 / 0.25);--tw-shadow-colored:0 25px 50px -12px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-sm{--tw-shadow:0 1px 2px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored:0 1px 2px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-indigo-950\/30{--tw-shadow-color:rgb(30 27 75 / 0.3);--tw-shadow:var(--tw-shadow-colored)}.shadow-indigo-500\/50{--tw-shadow-color:rgb(99 102 241 / 0.5);--tw-shadow:var(--tw-shadow-colored)}.backdrop-blur-md{--tw-backdrop-blur:blur(12px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.backdrop-blur-sm{--tw-backdrop-blur:blur(4px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-colors{transition-property:color, background-color, border-color, fill, stroke, -webkit-text-decoration-color;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.duration-200{transition-duration:200ms}.selection\:bg-indigo-500\/30 *::selection{background-color:rgb(99 102 241 / 0.3)}.selection\:text-indigo-200 *::selection{--tw-text-opacity:1;color:rgb(199 210 254 / var(--tw-text-opacity, 1))}.selection\:bg-indigo-500\/30::selection{background-color:rgb(99 102 241 / 0.3)}.selection\:text-indigo-200::selection{--tw-text-opacity:1;color:rgb(199 210 254 / var(--tw-text-opacity, 1))}.before\:absolute::before{content:var(--tw-content);position:absolute}.before\:bottom-3::before{content:var(--tw-content);bottom:0.75rem}.before\:left-\[15px\]::before{content:var(--tw-content);left:15px}.before\:top-3::before{content:var(--tw-content);top:0.75rem}.before\:hidden::before{content:var(--tw-content);display:none}.before\:w-px::before{content:var(--tw-content);width:1px}.before\:bg-slate-200::before{content:var(--tw-content);--tw-bg-opacity:1;background-color:rgb(226 232 240 / var(--tw-bg-opacity, 1))}.before\:content-\[\'\'\]::before{--tw-content:'';content:var(--tw-content)}.hover\:border-indigo-400\/60:hover{border-color:rgb(129 140 248 / 0.6)}.hover\:border-indigo-400\/50:hover{border-color:rgb(129 140 248 / 0.5)}.hover\:border-indigo-500\/50:hover{border-color:rgb(99 102 241 / 0.5)}.hover\:bg-indigo-500:hover{--tw-bg-opacity:1;background-color:rgb(99 102 241 / var(--tw-bg-opacity, 1))}.hover\:bg-slate-100:hover{--tw-bg-opacity:1;background-color:rgb(241 245 249 / var(--tw-bg-opacity, 1))}.hover\:bg-white\/\[0\.12\]:hover{background-color:rgb(255 255 255 / 0.12)}.hover\:text-indigo-600:hover{--tw-text-opacity:1;color:rgb(79 70 229 / var(--tw-text-opacity, 1))}.hover\:text-slate-700:hover{--tw-text-opacity:1;color:rgb(51 65 85 / var(--tw-text-opacity, 1))}.hover\:text-slate-900:hover{--tw-text-opacity:1;color:rgb(15 23 42 / var(--tw-text-opacity, 1))}.hover\:opacity-90:hover{opacity:0.9}.focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}.focus\:ring-2:focus{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}.focus\:ring-indigo-500:focus{--tw-ring-opacity:1;--tw-ring-color:rgb(99 102 241 / var(--tw-ring-opacity, 1))}.group:hover .group-hover\:translate-x-0\.5{--tw-translate-x:0.125rem;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.group:hover .group-hover\:border-indigo-400\/60{border-color:rgb(129 140 248 / 0.6)}.group:hover .group-hover\:text-indigo-400{--tw-text-opacity:1;color:rgb(129 140 248 / var(--tw-text-opacity, 1))}.group:hover .group-hover\:text-indigo-600{--tw-text-opacity:1;color:rgb(79 70 229 / var(--tw-text-opacity, 1))}.dark\:block:is(.dark *){display:block}.dark\:hidden:is(.dark *){display:none}.dark\:border-white\/\[0\.06\]:is(.dark *){border-color:rgb(255 255 255 / 0.06)}.dark\:border-white\/\[0\.07\]:is(.dark *){border-color:rgb(255 255 255 / 0.07)}.dark\:border-white\/\[0\.08\]:is(.dark *){border-color:rgb(255 255 255 / 0.08)}.dark\:border-white\/\[0\.09\]:is(.dark *){border-color:rgb(255 255 255 / 0.09)}.dark\:border-white\/\[0\.1\]:is(.dark *){border-color:rgb(255 255 255 / 0.1)}.dark\:border-slate-600:is(.dark *){--tw-border-opacity:1;border-color:rgb(71 85 105 / var(--tw-border-opacity, 1))}.dark\:border-white\/\[0\.05\]:is(.dark *){border-color:rgb(255 255 255 / 0.05)}.dark\:bg-\[\#0B0F17\]:is(.dark *){--tw-bg-opacity:1;background-color:rgb(11 15 23 / var(--tw-bg-opacity, 1))}.dark\:bg-\[\#0B0F17\]\/80:is(.dark *){background-color:rgb(11 15 23 / 0.8)}.dark\:bg-\[\#101623\]:is(.dark *){--tw-bg-opacity:1;background-color:rgb(16 22 35 / var(--tw-bg-opacity, 1))}.dark\:bg-\[\#101623\]\/80:is(.dark *){background-color:rgb(16 22 35 / 0.8)}.dark\:bg-\[\#111724\]:is(.dark *){--tw-bg-opacity:1;background-color:rgb(17 23 36 / var(--tw-bg-opacity, 1))}.dark\:bg-indigo-600:is(.dark *){--tw-bg-opacity:1;background-color:rgb(79 70 229 / var(--tw-bg-opacity, 1))}.dark\:bg-slate-100:is(.dark *){--tw-bg-opacity:1;background-color:rgb(241 245 249 / var(--tw-bg-opacity, 1))}.dark\:bg-white\/\[0\.025\]:is(.dark *){background-color:rgb(255 255 255 / 0.025)}.dark\:bg-white\/\[0\.03\]:is(.dark *){background-color:rgb(255 255 255 / 0.03)}.dark\:bg-white\/\[0\.04\]:is(.dark *){background-color:rgb(255 255 255 / 0.04)}.dark\:bg-\[\#0B0F17\]\/70:is(.dark *){background-color:rgb(11 15 23 / 0.7)}.dark\:text-emerald-300:is(.dark *){--tw-text-opacity:1;color:rgb(110 231 183 / var(--tw-text-opacity, 1))}.dark\:text-emerald-400:is(.dark *){--tw-text-opacity:1;color:rgb(52 211 153 / var(--tw-text-opacity, 1))}.dark\:text-indigo-300:is(.dark *){--tw-text-opacity:1;color:rgb(165 180 252 / var(--tw-text-opacity, 1))}.dark\:text-indigo-400:is(.dark *){--tw-text-opacity:1;color:rgb(129 140 248 / var(--tw-text-opacity, 1))}.dark\:text-slate-100:is(.dark *){--tw-text-opacity:1;color:rgb(241 245 249 / var(--tw-text-opacity, 1))}.dark\:text-slate-200:is(.dark *){--tw-text-opacity:1;color:rgb(226 232 240 / var(--tw-text-opacity, 1))}.dark\:text-slate-300:is(.dark *){--tw-text-opacity:1;color:rgb(203 213 225 / var(--tw-text-opacity, 1))}.dark\:text-slate-300\/90:is(.dark *){color:rgb(203 213 225 / 0.9)}.dark\:text-slate-400:is(.dark *){--tw-text-opacity:1;color:rgb(148 163 184 / var(--tw-text-opacity, 1))}.dark\:text-slate-50:is(.dark *){--tw-text-opacity:1;color:rgb(248 250 252 / var(--tw-text-opacity, 1))}.dark\:text-slate-500:is(.dark *){--tw-text-opacity:1;color:rgb(100 116 139 / var(--tw-text-opacity, 1))}.dark\:text-slate-900:is(.dark *){--tw-text-opacity:1;color:rgb(15 23 42 / var(--tw-text-opacity, 1))}.dark\:before\:bg-white\/\[0\.08\]:is(.dark *)::before{content:var(--tw-content);background-color:rgb(255 255 255 / 0.08)}.hover\:dark\:border-white\/\[0\.12\]:is(.dark *):hover{border-color:rgb(255 255 255 / 0.12)}.dark\:hover\:bg-indigo-500:hover:is(.dark *){--tw-bg-opacity:1;background-color:rgb(99 102 241 / var(--tw-bg-opacity, 1))}.dark\:hover\:bg-white\/\[0\.06\]:hover:is(.dark *){background-color:rgb(255 255 255 / 0.06)}.dark\:hover\:bg-white\/\[0\.07\]:hover:is(.dark *){background-color:rgb(255 255 255 / 0.07)}.dark\:hover\:bg-\[\#151C2C\]:hover:is(.dark *){--tw-bg-opacity:1;background-color:rgb(21 28 44 / var(--tw-bg-opacity, 1))}.dark\:hover\:text-indigo-300:hover:is(.dark *){--tw-text-opacity:1;color:rgb(165 180 252 / var(--tw-text-opacity, 1))}.dark\:hover\:text-slate-100:hover:is(.dark *){--tw-text-opacity:1;color:rgb(241 245 249 / var(--tw-text-opacity, 1))}.dark\:hover\:text-slate-200:hover:is(.dark *){--tw-text-opacity:1;color:rgb(226 232 240 / var(--tw-text-opacity, 1))}.group:hover .dark\:group-hover\:text-indigo-300:is(.dark *){--tw-text-opacity:1;color:rgb(165 180 252 / var(--tw-text-opacity, 1))}@media (min-width: 640px){.sm\:ml-1{margin-left:0.25rem}.sm\:inline{display:inline}.sm\:flex{display:flex}.sm\:grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}.sm\:grid-cols-4{grid-template-columns:repeat(4, minmax(0, 1fr))}.sm\:flex-row{flex-direction:row}.sm\:items-end{align-items:flex-end}.sm\:items-center{align-items:center}.sm\:self-center{align-self:center}.sm\:p-10{padding:2.5rem}.sm\:p-6{padding:1.5rem}.sm\:px-6{padding-left:1.5rem;padding-right:1.5rem}.sm\:py-16{padding-top:4rem;padding-bottom:4rem}.sm\:pl-10{padding-left:2.5rem}.sm\:text-2xl{font-size:1.5rem;line-height:2rem}.sm\:text-3xl{font-size:1.875rem;line-height:2.25rem}.sm\:text-5xl{font-size:3rem;line-height:1}.sm\:text-\[17px\]{font-size:17px}.sm\:text-base{font-size:1rem;line-height:1.5rem}.sm\:text-sm{font-size:0.875rem;line-height:1.25rem}.sm\:before\:block::before{content:var(--tw-content);display:block}}@media (min-width: 768px){.md\:flex{display:flex}.md\:hidden{display:none}.md\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.md\:flex-row{flex-direction:row}.md\:items-center{align-items:center}}</style></head>
+<body class="bg-slate-50 text-slate-900 dark:bg-[#0B0F17] dark:text-slate-200 transition-colors duration-200 antialiased selection:bg-indigo-500/30 selection:text-indigo-200">
+
+  <!-- Subtle Ambient Top Glow (Dark Mode) -->
+  <div class="pointer-events-none fixed inset-x-0 top-0 h-[420px] hidden dark:block" style="background: radial-gradient(ellipse 75% 55% at 50% -15%, rgba(99, 102, 241, 0.14), rgba(15, 23, 42, 0) 70%);"></div>
+
+  <!-- Top Navigation -->
+  <header class="no-print sticky top-0 z-40 backdrop-blur-md bg-slate-50/85 dark:bg-[#0B0F17]/80 border-b border-slate-200/80 dark:border-white/[0.07]">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
+      <a href="#top" class="font-semibold text-base tracking-tight flex items-center gap-2.5 shrink-0 group">
+        <span id="nav-initials" class="w-8 h-8 rounded-lg bg-indigo-500/15 border border-indigo-400/30 text-indigo-600 dark:text-indigo-300 text-xs font-mono font-semibold flex items-center justify-center group-hover:border-indigo-400/60 transition-colors">YM</span>
+        <span id="nav-name" class="hidden sm:inline text-slate-900 dark:text-slate-100">Yassin Mohamed</span>
+      </a>
+
+      <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600 dark:text-slate-400">
+        <a href="#projects" class="hover:text-indigo-600 dark:hover:text-slate-100 transition-colors">Initiatives</a>
+        <a href="#experience" class="hover:text-indigo-600 dark:hover:text-slate-100 transition-colors">Experience</a>
+        <a href="#education" class="hover:text-indigo-600 dark:hover:text-slate-100 transition-colors">Education</a>
+        <a href="#skills" class="hover:text-indigo-600 dark:hover:text-slate-100 transition-colors">Skills</a>
+        <a href="#contact" class="hover:text-indigo-600 dark:hover:text-slate-100 transition-colors">Contact</a>
+      </nav>
+
+      <div class="flex items-center gap-2">
+        <button id="theme-toggle" type="button" aria-label="Toggle color theme" class="p-2 rounded-lg border border-slate-200 dark:border-white/[0.08] bg-white/60 dark:bg-white/[0.03] text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-white/[0.07] transition-colors">
+          <svg id="icon-sun" class="w-4 h-4 hidden dark:block" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41"></path></svg>
+          <svg id="icon-moon" class="w-4 h-4 block dark:hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+
+        <button id="open-editor-btn" type="button" class="px-3 py-2 rounded-lg text-xs sm:text-sm font-medium bg-indigo-600 hover:bg-indigo-500 text-white shadow-sm shadow-indigo-950/30 transition-colors flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+          <span>Customize</span>
+        </button>
+
+        <button id="mobile-menu-btn" type="button" aria-label="Toggle menu" class="md:hidden p-2 rounded-lg border border-slate-200 dark:border-white/[0.08] text-slate-600 dark:text-slate-300">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"></path></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Nav -->
+    <div id="mobile-menu" class="hidden md:hidden border-t border-slate-200 dark:border-white/[0.07] px-4 py-3 space-y-2 text-sm font-medium bg-slate-50 dark:bg-[#0B0F17]">
+      <a href="#projects" class="block py-1.5 text-slate-700 dark:text-slate-300">Initiatives</a>
+      <a href="#experience" class="block py-1.5 text-slate-700 dark:text-slate-300">Experience</a>
+      <a href="#education" class="block py-1.5 text-slate-700 dark:text-slate-300">Education</a>
+      <a href="#skills" class="block py-1.5 text-slate-700 dark:text-slate-300">Skills</a>
+      <a href="#contact" class="block py-1.5 text-slate-700 dark:text-slate-300">Contact</a>
+    </div>
+  </header>
+
+  <main id="top" class="relative max-w-5xl mx-auto px-4 sm:px-6 py-12 sm:py-16 space-y-24">
+
+    <!-- Hero Section -->
+    <section class="fade-in relative rounded-3xl border border-slate-200/80 dark:border-white/[0.07] bg-white/70 dark:bg-[#101623]/80 bg-dot-pattern p-6 sm:p-10 space-y-7 overflow-hidden">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/25">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span id="hero-status">Open to Software Engineering Roles</span>
+        </div>
+        <span id="hero-location-badge" class="text-xs font-mono text-slate-500 dark:text-slate-400">Toronto, Ontario</span>
+      </div>
+
+      <div class="space-y-4 max-w-3xl">
+        <h1 class="text-3xl sm:text-5xl font-bold tracking-tight text-slate-900 dark:text-slate-50 leading-[1.15]">
+          <span id="hero-name">Yassin Mohamed</span>
+          <span class="block text-indigo-600 dark:text-indigo-400 mt-2 text-xl sm:text-2xl font-semibold tracking-normal" id="hero-role">Software Engineer · Backend &amp; Full-Stack</span>
+        </h1>
+        <p id="hero-bio" class="text-base sm:text-[17px] text-slate-600 dark:text-slate-300/90 leading-relaxed">Software Engineer with nearly 3 years of experience at Amazon specializing in large-scale automation and cloud-based fulfillment technologies—including an inventory defect resolution initiative that saved over $80M annually. Proficient across Java/Spring, TypeScript, Angular, React, Node.js, and AWS.</p>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-3 pt-1">
+        <a href="#projects" class="px-5 py-2.5 rounded-xl bg-slate-900 dark:bg-indigo-600 text-white text-sm font-medium hover:opacity-90 dark:hover:bg-indigo-500 transition-all shadow-sm">
+          Explore Key Initiatives
+        </a>
+        <button id="copy-email-hero" type="button" class="px-4 py-2.5 rounded-xl border border-slate-300 dark:border-white/[0.1] bg-white/80 dark:bg-white/[0.03] text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/[0.07] transition-colors flex items-center gap-2">
+          <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          <span id="hero-email-label">yassinmmoussa@gmail.com</span>
+        </button>
+        <div class="flex items-center gap-2 sm:ml-1">
+          <a id="link-github" href="https://github.com/yassinmmoussa" target="_blank" rel="noopener noreferrer" aria-label="GitHub" class="p-2.5 rounded-xl border border-slate-200 dark:border-white/[0.09] bg-white/80 dark:bg-white/[0.03] text-slate-600 dark:text-slate-300 hover:border-indigo-400/60 hover:text-indigo-600 dark:hover:text-indigo-300 transition-colors">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.09-.745.083-.729.083-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12z"></path></svg>
+          </a>
+          <a id="link-linkedin" href="https://linkedin.com/in/yassin-moussa/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" class="p-2.5 rounded-xl border border-slate-200 dark:border-white/[0.09] bg-white/80 dark:bg-white/[0.03] text-slate-600 dark:text-slate-300 hover:border-indigo-400/60 hover:text-indigo-600 dark:hover:text-indigo-300 transition-colors">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"></path></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Quick Highlights -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-slate-200/70 dark:border-white/[0.06]">
+        <div class="p-3.5 rounded-xl bg-slate-50/80 dark:bg-white/[0.025] border border-slate-200/70 dark:border-white/[0.06]">
+          <div class="text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400">Location</div>
+          <div id="stat-location" class="text-sm font-semibold mt-1 text-slate-900 dark:text-slate-100">Toronto, Ontario</div>
+        </div>
+        <div class="p-3.5 rounded-xl bg-slate-50/80 dark:bg-white/[0.025] border border-slate-200/70 dark:border-white/[0.06]">
+          <div class="text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400">Experience</div>
+          <div id="stat-experience" class="text-sm font-semibold mt-1 text-slate-900 dark:text-slate-100">3+ Years (Amazon)</div>
+        </div>
+        <div class="p-3.5 rounded-xl bg-slate-50/80 dark:bg-white/[0.025] border border-slate-200/70 dark:border-white/[0.06]">
+          <div class="text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400">Core Stack</div>
+          <div id="stat-stack" class="text-sm font-semibold mt-1 text-slate-900 dark:text-slate-100">Java, TS &amp; AWS</div>
+        </div>
+        <div class="p-3.5 rounded-xl bg-slate-50/80 dark:bg-white/[0.025] border border-slate-200/70 dark:border-white/[0.06]">
+          <div class="text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400">Proven Impact</div>
+          <div id="stat-availability" class="text-sm font-semibold mt-1 text-emerald-600 dark:text-emerald-400">$80M+ Annual Savings</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Projects / Key Initiatives Section -->
+    <section id="projects" class="space-y-6 scroll-mt-24">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <div>
+          <span class="text-xs font-mono text-indigo-600 dark:text-indigo-400 tracking-wider uppercase">01 / Featured Work</span>
+          <h2 class="text-2xl sm:text-3xl font-bold tracking-tight mt-1 text-slate-900 dark:text-slate-50">Key Initiatives &amp; Projects</h2>
+          <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">Select any card to inspect architecture, scope, and measurable impact.</p>
+        </div>
+        <div id="project-filters" class="flex flex-wrap gap-2"><button type="button" data-cat="All" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-colors bg-indigo-600 text-white">All</button><button type="button" data-cat="Backend &amp; Cloud" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-colors bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.08] text-slate-600 dark:text-slate-400 hover:border-indigo-400/50 hover:text-slate-900 dark:hover:text-slate-200">Backend &amp; Cloud</button><button type="button" data-cat="Full-Stack" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-colors bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.08] text-slate-600 dark:text-slate-400 hover:border-indigo-400/50 hover:text-slate-900 dark:hover:text-slate-200">Full-Stack</button><button type="button" data-cat="Embedded &amp; Desktop" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-colors bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.08] text-slate-600 dark:text-slate-400 hover:border-indigo-400/50 hover:text-slate-900 dark:hover:text-slate-200">Embedded &amp; Desktop</button></div>
+      </div>
+
+      <div id="projects-grid" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <article data-id="p1" tabindex="0" role="button" class="project-card group cursor-pointer rounded-2xl bg-white dark:bg-[#111724] border border-slate-200/90 dark:border-white/[0.07] overflow-hidden hover:border-indigo-500/50 dark:hover:bg-[#151C2C] transition-all flex flex-col">
+          <div class="h-28 px-4 pt-3 pb-2 border-b border-slate-100 dark:border-white/[0.05] flex flex-col justify-between text-indigo-400 bg-indigo-500/[0.06] border-indigo-500/20">
+            <div class="flex items-center justify-between gap-2">
+              <span class="px-2.5 py-0.5 rounded-md text-[11px] font-mono font-medium bg-white/70 dark:bg-[#0B0F17]/70 border border-current/20">Backend &amp; Cloud</span>
+              <span class="text-[11px] font-mono font-semibold opacity-90">$80M+ / yr saved</span>
+            </div>
+            <div class="h-16 w-full flex items-center justify-center">
+              <svg class="w-full h-full opacity-75" viewBox="0 0 280 88" fill="none">
+            <rect x="14" y="24" width="56" height="40" rx="8" stroke="currentColor" stroke-opacity="0.35" stroke-width="1.5" fill="currentColor" fill-opacity="0.06"></rect>
+            <path d="M70 44h36" stroke="currentColor" stroke-opacity="0.4" stroke-width="1.5" stroke-dasharray="3 3"></path>
+            <rect x="106" y="18" width="68" height="52" rx="10" stroke="currentColor" stroke-opacity="0.6" stroke-width="1.5" fill="currentColor" fill-opacity="0.1"></rect>
+            <path d="M174 44h36" stroke="currentColor" stroke-opacity="0.4" stroke-width="1.5" stroke-dasharray="3 3"></path>
+            <rect x="210" y="24" width="56" height="40" rx="8" stroke="currentColor" stroke-opacity="0.35" stroke-width="1.5" fill="currentColor" fill-opacity="0.06"></rect>
+            <circle cx="42" cy="44" r="6" fill="currentColor" fill-opacity="0.45"></circle>
+            <path d="M128 44l8 8 16-16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+            <circle cx="238" cy="44" r="6" fill="currentColor" fill-opacity="0.45"></circle>
+          </svg>
+            </div>
+          </div>
+          <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
+            <div>
+              <div class="flex items-center justify-between gap-2">
+                <h3 class="font-semibold text-base text-slate-900 dark:text-slate-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-300 transition-colors">Automated Inventory Defect Resolution</h3>
+                <svg class="w-4 h-4 text-slate-400 group-hover:text-indigo-400 group-hover:translate-x-0.5 transition-all shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+              </div>
+              <p class="text-sm text-slate-600 dark:text-slate-400 mt-1.5 leading-relaxed">Large-scale Java &amp; Spring automation platform eliminating inventory defects across Amazon fulfillment.</p>
+            </div>
+            <div class="flex flex-wrap gap-1.5">
+              <span class="px-2 py-0.5 rounded-md text-xs font-mono bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">Java</span><span class="px-2 py-0.5 rounded-md text-xs font-mono bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">Spring</span><span class="px-2 py-0.5 rounded-md text-xs font-mono bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">Lombok</span><span class="px-2 py-0.5 rounded-md text-xs font-mono bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">AWS</span><span class="px-2 py-0.5 rounded-md text-xs font-mono bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">CI/CD</span>
+            </div>
+          </div>
+        </article>
+      
+        <article data-id="p2" tabindex="0" role="button" class="project-card group cursor-pointer rounded-2xl bg-white dark:bg-[#111724] border border-slate-200/90 dark:border-white/[0.07] overflow-hidden hover:border-indigo-500/50 dark:hover:bg-[#151C2C] transition-all flex flex-col">
+          <div class="h-28 px-4 pt-3 pb-2 border-b border-slate-100 dark:border-white/[0.05] flex flex-col justify-between text-cyan-400 bg-cyan-500/[0.06] border-cyan-500/20">
+            <div class="flex items-center justify-between gap-2">
+              <span class="px-2.5 py-0.5 rounded-md text-[11px] font-mono font-medium bg-white/70 dark:bg-[#0B0F17]/70 border border-current/20">Backend &amp; Cloud</span>
+              <span class="text-[11px] font-mono font-semibold opacity-90">~170k req / min</span>
+            </div>
+            <div class="h-16 w-full flex items-center justify-center">
+              <svg class="w-full h-full opacity-75" viewBox="0 0 280 88" fill="none">
+            <path d="M12 62 C 48 62, 54 26, 90 26 C 126 26, 132 54, 168 42 C 204 30, 224 18, 268 22" stroke="currentColor" stroke-width="2" stroke-opacity="0.7" fill="none"></path>
+            <path d="M12 70 C 56 70, 68 44, 108 44 C 148 44, 160 66, 204 52 C 236 42, 248 36, 268 38" stroke="currentColor" stroke-width="1.5" stroke-opacity="0.3" fill="none"></path>
+            <circle cx="90" cy="26" r="4" fill="currentColor"></circle>
+            <circle cx="168" cy="42" r="4" fill="currentColor"></circle>
+            <circle cx="242" cy="21" r="4" fill="currentColor"></circle>
+          </svg>
+            </div>
+          </div>
+          <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
+            <div>
+              <div class="flex items-center justify-between gap-2">
+                <h3 class="font-semibold text-base text-slate-900 dark:text-slate-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-300 transition-colors">Global Inventory Resolution System</h3>
+                <svg class="w-4 h-4 text-slate-400 group-hover:text-indigo-400 group-hover:translate-x-0.5 transition-all shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+              </div>
+              <p class="text-sm text-slate-600 dark:text-slate-400 mt-1.5 leading-relaxed">Core process enhancements for a high-throughput distributed system handling ~170k requests/min.</p>
+            </div>
+            <div class="flex flex-wrap gap-1.5">
+              <span class="px-2 py-0.5 rounded-md text-xs font-mono bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">Java</span><span class="px-2 py-0.5 rounded-md text-xs font-mono bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">Spring</span><span class="px-2 py-0.5 rounded-md text-xs font-mono bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">Docker</span><span class="px-2 py-0.5 rounded-md text-xs font-mono bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">Kubernetes</span><span class="px-2 py-0.5 rounded-md text-xs font-mono bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">CI/CD</span>
+            </div>
+          </div>
+        </article>
+      
+        <article data-id="p3" tabindex="0" role="button" class="project-card group cursor-pointer rounded-2xl bg-white dark:bg-[#111724] border border-slate-200/90 dark:border-white/[0.07] overflow-hidden hover:border-indigo-500/50 dark:hover:bg-[#151C2C] transition-all flex flex-col">
+          <div class="h-28 px-4 pt-3 pb-2 border-b border-slate-100 dark:border-white/[0.05] flex flex-col justify-between text-emerald-400 bg-emerald-500/[0.06] border-emerald-500/20">
+            <div class="flex items-center justify-between gap-2">
+              <span class="px-2.5 py-0.5 rounded-md text-[11px] font-mono font-medium bg-white/70 dark:bg-[#0B0F17]/70 border border-current/20">Full-Stack</span>
+              <span class="text-[11px] font-mono font-semibold opacity-90">Production Ready</span>
+            </div>
+            <div class="h-16 w-full flex items-center justify-center">
+              <svg class="w-full h-full opacity-75" viewBox="0 0 280 88" fill="none">
+            <rect x="22" y="16" width="96" height="56" rx="8" stroke="currentColor" stroke-opacity="0.4" stroke-width="1.5" fill="currentColor" fill-opacity="0.05"></rect>
+            <line x1="34" y1="32" x2="88" y2="32" stroke="currentColor" stroke-opacity="0.5" stroke-width="2" stroke-linecap="round"></line>
+            <line x1="34" y1="44" x2="104" y2="44" stroke="currentColor" stroke-opacity="0.25" stroke-width="2" stroke-linecap="round"></line>
+            <line x1="34" y1="56" x2="72" y2="56" stroke="currentColor" stroke-opacity="0.25" stroke-width="2" stroke-linecap="round"></line>
+            <path d="M124 44h32" stroke="currentColor" stroke-opacity="0.45" stroke-width="1.5" stroke-dasharray="3 3"></path>
+            <rect x="162" y="16" width="96" height="56" rx="8" stroke="currentColor" stroke-opacity="0.55" stroke-width="1.5" fill="currentColor" fill-opacity="0.08"></rect>
+            <circle cx="186" cy="44" r="12" stroke="currentColor" stroke-opacity="0.6" stroke-width="1.5"></circle>
+            <path d="M210 38h32M210 50h22" stroke="currentColor" stroke-opacity="0.45" stroke-width="2" stroke-linecap="round"></path>
+          </svg>
+            </div>
+          </div>
+          <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
+            <div>
+              <div class="flex items-center justify-between gap-2">
+                <h3 class="font-semibold text-base text-slate-900 dark:text-slate-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-300 transition-colors">Financial Matchmaking Platform &amp; LMS</h3>
+                <svg class="w-4 h-4 text-slate-400 group-hover:text-indigo-400 group-hover:translate-x-0.5 transition-all shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+              </div>
+              <p class="text-sm text-slate-600 dark:text-slate-400 mt-1.5 leading-relaxed">Core platform features, bug fixes, and Loan Management System architecture evaluation at Qardy.</p>
+            </div>
+            <div class="flex flex-wrap gap-1.5">
+              <span class="px-2 py-0.5 rounded-md text-xs font-mono bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">Angular</span><span class="px-2 py-0.5 rounded-md text-xs font-mono bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">TypeScript</span><span class="px-2 py-0.5 rounded-md text-xs font-mono bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">Node.js</span><span class="px-2 py-0.5 rounded-md text-xs font-mono bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">Express</span><span class="px-2 py-0.5 rounded-md text-xs font-mono bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">MongoDB</span>
+            </div>
+          </div>
+        </article>
+      
+        <article data-id="p4" tabindex="0" role="button" class="project-card group cursor-pointer rounded-2xl bg-white dark:bg-[#111724] border border-slate-200/90 dark:border-white/[0.07] overflow-hidden hover:border-indigo-500/50 dark:hover:bg-[#151C2C] transition-all flex flex-col">
+          <div class="h-28 px-4 pt-3 pb-2 border-b border-slate-100 dark:border-white/[0.05] flex flex-col justify-between text-amber-400 bg-amber-500/[0.06] border-amber-500/20">
+            <div class="flex items-center justify-between gap-2">
+              <span class="px-2.5 py-0.5 rounded-md text-[11px] font-mono font-medium bg-white/70 dark:bg-[#0B0F17]/70 border border-current/20">Embedded &amp; Desktop</span>
+              <span class="text-[11px] font-mono font-semibold opacity-90">Raspberry Pi + Swing</span>
+            </div>
+            <div class="h-16 w-full flex items-center justify-center">
+              <svg class="w-full h-full opacity-75" viewBox="0 0 280 88" fill="none">
+            <g fill="currentColor">
+              <circle cx="88" cy="26" r="4" fill-opacity="0.8"></circle><circle cx="104" cy="26" r="4" fill-opacity="0.25"></circle>
+              <circle cx="88" cy="44" r="4" fill-opacity="0.8"></circle><circle cx="104" cy="44" r="4" fill-opacity="0.8"></circle>
+              <circle cx="88" cy="62" r="4" fill-opacity="0.25"></circle><circle cx="104" cy="62" r="4" fill-opacity="0.25"></circle>
+              <circle cx="136" cy="26" r="4" fill-opacity="0.8"></circle><circle cx="152" cy="26" r="4" fill-opacity="0.8"></circle>
+              <circle cx="136" cy="44" r="4" fill-opacity="0.25"></circle><circle cx="152" cy="44" r="4" fill-opacity="0.8"></circle>
+              <circle cx="136" cy="62" r="4" fill-opacity="0.8"></circle><circle cx="152" cy="62" r="4" fill-opacity="0.25"></circle>
+              <circle cx="184" cy="26" r="4" fill-opacity="0.8"></circle><circle cx="200" cy="26" r="4" fill-opacity="0.25"></circle>
+              <circle cx="184" cy="44" r="4" fill-opacity="0.25"></circle><circle cx="200" cy="44" r="4" fill-opacity="0.8"></circle>
+              <circle cx="184" cy="62" r="4" fill-opacity="0.8"></circle><circle cx="200" cy="62" r="4" fill-opacity="0.8"></circle>
+            </g>
+          </svg>
+            </div>
+          </div>
+          <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
+            <div>
+              <div class="flex items-center justify-between gap-2">
+                <h3 class="font-semibold text-base text-slate-900 dark:text-slate-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-300 transition-colors">Braille Learning Toy &amp; Scenario GUI</h3>
+                <svg class="w-4 h-4 text-slate-400 group-hover:text-indigo-400 group-hover:translate-x-0.5 transition-all shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+              </div>
+              <p class="text-sm text-slate-600 dark:text-slate-400 mt-1.5 leading-relaxed">Interactive Raspberry Pi Braille-teaching toy and Java Swing branching scenario studio at PiET Lab.</p>
+            </div>
+            <div class="flex flex-wrap gap-1.5">
+              <span class="px-2 py-0.5 rounded-md text-xs font-mono bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">Java</span><span class="px-2 py-0.5 rounded-md text-xs font-mono bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">Java Swing</span><span class="px-2 py-0.5 rounded-md text-xs font-mono bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">Raspberry Pi</span><span class="px-2 py-0.5 rounded-md text-xs font-mono bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">OOP</span>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Experience Section -->
+    <section id="experience" class="space-y-6 scroll-mt-24">
+      <div>
+        <span class="text-xs font-mono text-indigo-600 dark:text-indigo-400 tracking-wider uppercase">02 / Career</span>
+        <h2 class="text-2xl sm:text-3xl font-bold tracking-tight mt-1 text-slate-900 dark:text-slate-50">Experience</h2>
+        <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">Engineering roles spanning high-volume fulfillment systems, fintech platforms, and embedded software.</p>
+      </div>
+
+      <div id="experience-list" class="relative space-y-5 before:content-[''] before:hidden sm:before:block before:absolute before:left-[15px] before:top-3 before:bottom-3 before:w-px before:bg-slate-200 dark:before:bg-white/[0.08]">
+        <div class="relative sm:pl-10">
+          <span class="hidden sm:flex absolute left-[9px] top-6 w-3.5 h-3.5 rounded-full border-2 bg-indigo-500 border-indigo-300/60 shadow-sm shadow-indigo-500/50"></span>
+          <div class="p-5 sm:p-6 rounded-2xl bg-white dark:bg-[#111724] border border-slate-200/90 dark:border-white/[0.07] hover:dark:border-white/[0.12] transition-colors space-y-3">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+              <div>
+                <h3 class="font-semibold text-base text-slate-900 dark:text-slate-100">Fullstack Engineer - Remote (Contract)</h3>
+                <div class="text-sm text-indigo-600 dark:text-indigo-400 font-medium mt-0.5">Qardy E-Payment Solutions · <span class="text-slate-500 dark:text-slate-400 font-normal">Cairo, Egypt (Remote)</span></div>
+              </div>
+              <span class="text-xs font-mono px-2.5 py-1 rounded-md bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.07] text-slate-600 dark:text-slate-300 self-start sm:self-center shrink-0">Oct 2025 – Apr 2026</span>
+            </div>
+            <ul class="space-y-1.5 text-sm text-slate-600 dark:text-slate-300/90 list-disc pl-5 leading-relaxed">
+              <li>Contributed to core platform development of a financial matchmaking service using Angular on the front end and Node.js/Express with MongoDB/Mongoose on the back end.</li><li>Engineered critical feature requests (such as additional data views) and resolved bugs supporting platform stability and production readiness.</li><li>Initiated technical research and evaluation of open-source Loan Management Systems (LMS) to guide a new proprietary lending product.</li>
+            </ul>
+          </div>
+        </div>
+      
+        <div class="relative sm:pl-10">
+          <span class="hidden sm:flex absolute left-[9px] top-6 w-3.5 h-3.5 rounded-full border-2 bg-[#0B0F17] border-slate-400 dark:border-slate-600"></span>
+          <div class="p-5 sm:p-6 rounded-2xl bg-white dark:bg-[#111724] border border-slate-200/90 dark:border-white/[0.07] hover:dark:border-white/[0.12] transition-colors space-y-3">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+              <div>
+                <h3 class="font-semibold text-base text-slate-900 dark:text-slate-100">Technical Upskilling &amp; Independent Study</h3>
+                <div class="text-sm text-indigo-600 dark:text-indigo-400 font-medium mt-0.5">Independent Technical Residency · <span class="text-slate-500 dark:text-slate-400 font-normal">Toronto, ON</span></div>
+              </div>
+              <span class="text-xs font-mono px-2.5 py-1 rounded-md bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.07] text-slate-600 dark:text-slate-300 self-start sm:self-center shrink-0">Oct 2024 – Oct 2025</span>
+            </div>
+            <ul class="space-y-1.5 text-sm text-slate-600 dark:text-slate-300/90 list-disc pl-5 leading-relaxed">
+              <li>Dedicated 12 months to an intensive technical residency specializing in modern full-stack technologies and software architecture.</li><li>Built production-ready feature sets and performance optimization exercises across Angular, React, Node.js, Express, and MongoDB.</li><li>Strengthened proficiency in MVC design patterns, complex data modeling, and modern Git workflows.</li>
+            </ul>
+          </div>
+        </div>
+      
+        <div class="relative sm:pl-10">
+          <span class="hidden sm:flex absolute left-[9px] top-6 w-3.5 h-3.5 rounded-full border-2 bg-[#0B0F17] border-slate-400 dark:border-slate-600"></span>
+          <div class="p-5 sm:p-6 rounded-2xl bg-white dark:bg-[#111724] border border-slate-200/90 dark:border-white/[0.07] hover:dark:border-white/[0.12] transition-colors space-y-3">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+              <div>
+                <h3 class="font-semibold text-base text-slate-900 dark:text-slate-100">Software Development Engineer</h3>
+                <div class="text-sm text-indigo-600 dark:text-indigo-400 font-medium mt-0.5">Amazon Development Centre Canada ULC – Fulfillment Technologies · <span class="text-slate-500 dark:text-slate-400 font-normal">Toronto, ON</span></div>
+              </div>
+              <span class="text-xs font-mono px-2.5 py-1 rounded-md bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.07] text-slate-600 dark:text-slate-300 self-start sm:self-center shrink-0">Feb 2022 – Oct 2024</span>
+            </div>
+            <ul class="space-y-1.5 text-sm text-slate-600 dark:text-slate-300/90 list-disc pl-5 leading-relaxed">
+              <li>Contributed to the architecture, design, and implementation of a large-scale Java/Spring automation project (with Lombok) targeting inventory defects, saving over $80M annually.</li><li>Owned the full development lifecycle for multiple initiatives in a high-volume (~170k requests/min) global inventory resolution system using CI/CD and containerized deployments.</li><li>Provided thorough design and code reviews on architecture, performance, integration testing, and security compliance, and contributed as an "away developer" on newer AWS services.</li>
+            </ul>
+          </div>
+        </div>
+      
+        <div class="relative sm:pl-10">
+          <span class="hidden sm:flex absolute left-[9px] top-6 w-3.5 h-3.5 rounded-full border-2 bg-[#0B0F17] border-slate-400 dark:border-slate-600"></span>
+          <div class="p-5 sm:p-6 rounded-2xl bg-white dark:bg-[#111724] border border-slate-200/90 dark:border-white/[0.07] hover:dark:border-white/[0.12] transition-colors space-y-3">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+              <div>
+                <h3 class="font-semibold text-base text-slate-900 dark:text-slate-100">Software Developer</h3>
+                <div class="text-sm text-indigo-600 dark:text-indigo-400 font-medium mt-0.5">PiET Lab, York University · <span class="text-slate-500 dark:text-slate-400 font-normal">Toronto, ON</span></div>
+              </div>
+              <span class="text-xs font-mono px-2.5 py-1 rounded-md bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.07] text-slate-600 dark:text-slate-300 self-start sm:self-center shrink-0">Sep 2018 – May 2019</span>
+            </div>
+            <ul class="space-y-1.5 text-sm text-slate-600 dark:text-slate-300/90 list-disc pl-5 leading-relaxed">
+              <li>Served as primary software developer for an interactive Raspberry Pi-based consumer toy teaching visually impaired children to read Braille.</li><li>Developed Java simulation software to chart hardware progress and a Java Swing scripting GUI for creating branching learning scenarios.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Education Section -->
+    <section id="education" class="space-y-6 scroll-mt-24">
+      <div>
+        <span class="text-xs font-mono text-indigo-600 dark:text-indigo-400 tracking-wider uppercase">03 / Background</span>
+        <h2 class="text-2xl sm:text-3xl font-bold tracking-tight mt-1 text-slate-900 dark:text-slate-50">Education</h2>
+      </div>
+      <div class="p-6 rounded-2xl bg-white dark:bg-[#111724] border border-slate-200/90 dark:border-white/[0.07] space-y-3">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <h3 class="font-semibold text-base text-slate-900 dark:text-slate-100">Bachelor of Science in Software Engineering</h3>
+            <div class="text-sm text-indigo-600 dark:text-indigo-400 font-medium mt-0.5">York University – Lassonde School of Engineering · <span class="text-slate-500 dark:text-slate-400 font-normal">Toronto, ON</span></div>
+          </div>
+          <span class="text-xs font-mono px-2.5 py-1 rounded-md bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.07] text-slate-600 dark:text-slate-300 self-start sm:self-center">Sep 2015 – May 2021</span>
+        </div>
+        <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed pt-1">
+          <span class="font-medium text-slate-800 dark:text-slate-200">Relevant Coursework:</span> Design and Analysis of Algorithms, Machine Learning, Database Systems, Software Design, Data Structures, Advanced Object-Oriented Programming, and Software Engineering Requirements &amp; Testing.
+        </p>
+      </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section id="skills" class="space-y-6 scroll-mt-24">
+      <div>
+        <span class="text-xs font-mono text-indigo-600 dark:text-indigo-400 tracking-wider uppercase">04 / Toolkit</span>
+        <h2 class="text-2xl sm:text-3xl font-bold tracking-tight mt-1 text-slate-900 dark:text-slate-50">Technical Skills</h2>
+        <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">Languages, frameworks, databases, and cloud/DevOps tooling.</p>
+      </div>
+
+      <div id="skills-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+        <div class="p-5 rounded-2xl bg-white dark:bg-[#111724] border border-slate-200/90 dark:border-white/[0.07] space-y-3">
+          <h3 class="font-semibold text-sm text-slate-900 dark:text-slate-100">Languages</h3>
+          <div class="flex flex-wrap gap-2">
+            <span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">Java</span><span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">TypeScript</span><span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">JavaScript</span><span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">Python</span><span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">Ruby</span><span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">SQL</span><span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">HTML</span><span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">CSS</span><span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">C</span><span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">C++</span><span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">Verilog</span><span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">MATLAB</span>
+          </div>
+        </div>
+      
+        <div class="p-5 rounded-2xl bg-white dark:bg-[#111724] border border-slate-200/90 dark:border-white/[0.07] space-y-3">
+          <h3 class="font-semibold text-sm text-slate-900 dark:text-slate-100">Frontend &amp; Backend</h3>
+          <div class="flex flex-wrap gap-2">
+            <span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">React</span><span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">Angular</span><span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">Redux</span><span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">Tailwind CSS</span><span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">Bootstrap</span><span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">Spring</span><span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">Node.js</span><span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">Express</span><span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">Flask</span><span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">REST APIs</span><span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">GraphQL</span><span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">PassportJS</span><span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">Mongoose</span><span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">MongoDB</span><span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">IBM DB2</span>
+          </div>
+        </div>
+      
+        <div class="p-5 rounded-2xl bg-white dark:bg-[#111724] border border-slate-200/90 dark:border-white/[0.07] space-y-3">
+          <h3 class="font-semibold text-sm text-slate-900 dark:text-slate-100">Cloud, DevOps &amp; OS</h3>
+          <div class="flex flex-wrap gap-2">
+            <span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">AWS (EC2, S3, Lambda)</span><span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">GCP</span><span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">Heroku</span><span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">Docker</span><span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">Kubernetes</span><span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">CI/CD Pipelines</span><span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">GitHub Actions</span><span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">Jenkins</span><span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">Bamboo</span><span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">Git</span><span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">Apache / Tomcat</span><span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">Linux</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="scroll-mt-24">
+      <div class="rounded-2xl bg-slate-900 dark:bg-[#111724] border border-slate-800 dark:border-white/[0.08] text-white p-6 sm:p-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div class="space-y-2 max-w-xl">
+          <span class="text-xs font-mono text-indigo-400 uppercase tracking-wider">Get in touch</span>
+          <h2 class="text-2xl font-bold tracking-tight text-slate-50">Let's Connect</h2>
+          <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+            Hiring for a Software Engineer role? Reach out directly at <span id="contact-email-text" class="text-white font-medium">yassinmmoussa@gmail.com</span> or <span id="contact-phone-text" class="text-white font-medium">(647) 919-2182</span>.
+          </p>
+        </div>
+        <div class="flex flex-wrap gap-3 shrink-0">
+          <a id="contact-mailto" href="mailto:yassinmmoussa@gmail.com" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium transition-colors" target="_blank" rel="noopener noreferrer">
+            Send Email
+          </a>
+          <button id="copy-email-footer" type="button" class="px-5 py-2.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.1] text-slate-100 text-sm font-medium transition-colors">
+            Copy Email
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="border-t border-slate-200 dark:border-white/[0.06] py-8 text-center text-xs text-slate-500 dark:text-slate-500">
+    <span id="footer-text">Yassin Mohamed · Toronto, Ontario</span>
+  </footer>
+
+  <!-- Project Detail Modal -->
+  <div id="project-modal" class="no-print fixed inset-0 z-50 hidden items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+    <div class="bg-white dark:bg-[#111724] border border-slate-200 dark:border-white/[0.1] rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl fade-in">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <span id="modal-category" class="text-xs font-mono uppercase tracking-wider text-indigo-600 dark:text-indigo-400"></span>
+          <h3 id="modal-title" class="text-xl font-bold mt-1 text-slate-900 dark:text-slate-50"></h3>
+        </div>
+        <button id="close-modal-btn" type="button" aria-label="Close modal" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/[0.06]">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+        </button>
+      </div>
+      <p id="modal-summary" class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed"></p>
+      <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-[#0B0F17] border border-slate-200 dark:border-white/[0.07]">
+        <div class="text-[11px] font-mono font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-1">Key Impact</div>
+        <p id="modal-impact" class="text-sm font-medium text-slate-800 dark:text-slate-200"></p>
+      </div>
+      <div id="modal-tags" class="flex flex-wrap gap-1.5"></div>
+    </div>
+  </div>
+
+  <!-- Customize Drawer -->
+  <div id="editor-drawer" class="no-print fixed inset-0 z-50 justify-end bg-black/60 backdrop-blur-sm flex hidden">
+    <div class="bg-white dark:bg-[#101623] border-l border-slate-200 dark:border-white/[0.08] w-full max-w-md h-full flex flex-col shadow-2xl">
+      <div class="p-5 border-b border-slate-200 dark:border-white/[0.08] flex items-center justify-between">
+        <div>
+          <h3 class="font-bold text-base text-slate-900 dark:text-slate-100">Customize Your Portfolio</h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Add your GitHub/LinkedIn links or tweak details, then download.</p>
+        </div>
+        <button id="close-editor-btn" type="button" aria-label="Close editor" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+        </button>
+      </div>
+
+      <form id="editor-form" class="p-5 space-y-4 overflow-y-auto flex-1 text-sm">
+        <div>
+          <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Full Name</label>
+          <input id="input-name" type="text" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-white/[0.1] bg-white dark:bg-[#0B0F17] text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Target Role / Headline</label>
+          <input id="input-role" type="text" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-white/[0.1] bg-white dark:bg-[#0B0F17] text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Status Badge</label>
+          <input id="input-status" type="text" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-white/[0.1] bg-white dark:bg-[#0B0F17] text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Short Bio</label>
+          <textarea id="input-bio" rows="4" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-white/[0.1] bg-white dark:bg-[#0B0F17] text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Location</label>
+            <input id="input-location" type="text" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-white/[0.1] bg-white dark:bg-[#0B0F17] text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Experience</label>
+            <input id="input-exp" type="text" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-white/[0.1] bg-white dark:bg-[#0B0F17] text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Email</label>
+          <input id="input-email" type="email" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-white/[0.1] bg-white dark:bg-[#0B0F17] text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Phone</label>
+          <input id="input-phone" type="text" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-white/[0.1] bg-white dark:bg-[#0B0F17] text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">GitHub URL</label>
+          <input id="input-github" type="url" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-white/[0.1] bg-white dark:bg-[#0B0F17] text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">LinkedIn URL</label>
+          <input id="input-linkedin" type="url" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-white/[0.1] bg-white dark:bg-[#0B0F17] text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+      </form>
+
+      <div class="p-5 border-t border-slate-200 dark:border-white/[0.08] flex items-center justify-between gap-3 bg-slate-50 dark:bg-[#0B0F17]">
+        <button id="reset-data-btn" type="button" class="px-3 py-2 rounded-lg border border-slate-300 dark:border-white/[0.1] text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/[0.06]">
+          Reset
+        </button>
+        <button id="download-html-btn" type="button" class="flex-1 px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium transition-colors">
+          Download index.html
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="no-print fixed bottom-5 right-5 z-50 hidden px-4 py-2.5 rounded-xl bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 text-sm font-medium shadow-lg"></div>
+
+  <script>
+    const PROJECT_DIAGRAMS = {
+      p1: `<svg class="w-full h-full opacity-75" viewBox="0 0 280 88" fill="none">
+            <rect x="14" y="24" width="56" height="40" rx="8" stroke="currentColor" stroke-opacity="0.35" stroke-width="1.5" fill="currentColor" fill-opacity="0.06"/>
+            <path d="M70 44h36" stroke="currentColor" stroke-opacity="0.4" stroke-width="1.5" stroke-dasharray="3 3"/>
+            <rect x="106" y="18" width="68" height="52" rx="10" stroke="currentColor" stroke-opacity="0.6" stroke-width="1.5" fill="currentColor" fill-opacity="0.1"/>
+            <path d="M174 44h36" stroke="currentColor" stroke-opacity="0.4" stroke-width="1.5" stroke-dasharray="3 3"/>
+            <rect x="210" y="24" width="56" height="40" rx="8" stroke="currentColor" stroke-opacity="0.35" stroke-width="1.5" fill="currentColor" fill-opacity="0.06"/>
+            <circle cx="42" cy="44" r="6" fill="currentColor" fill-opacity="0.45"/>
+            <path d="M128 44l8 8 16-16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="238" cy="44" r="6" fill="currentColor" fill-opacity="0.45"/>
+          </svg>`,
+      p2: `<svg class="w-full h-full opacity-75" viewBox="0 0 280 88" fill="none">
+            <path d="M12 62 C 48 62, 54 26, 90 26 C 126 26, 132 54, 168 42 C 204 30, 224 18, 268 22" stroke="currentColor" stroke-width="2" stroke-opacity="0.7" fill="none"/>
+            <path d="M12 70 C 56 70, 68 44, 108 44 C 148 44, 160 66, 204 52 C 236 42, 248 36, 268 38" stroke="currentColor" stroke-width="1.5" stroke-opacity="0.3" fill="none"/>
+            <circle cx="90" cy="26" r="4" fill="currentColor"/>
+            <circle cx="168" cy="42" r="4" fill="currentColor"/>
+            <circle cx="242" cy="21" r="4" fill="currentColor"/>
+          </svg>`,
+      p3: `<svg class="w-full h-full opacity-75" viewBox="0 0 280 88" fill="none">
+            <rect x="22" y="16" width="96" height="56" rx="8" stroke="currentColor" stroke-opacity="0.4" stroke-width="1.5" fill="currentColor" fill-opacity="0.05"/>
+            <line x1="34" y1="32" x2="88" y2="32" stroke="currentColor" stroke-opacity="0.5" stroke-width="2" stroke-linecap="round"/>
+            <line x1="34" y1="44" x2="104" y2="44" stroke="currentColor" stroke-opacity="0.25" stroke-width="2" stroke-linecap="round"/>
+            <line x1="34" y1="56" x2="72" y2="56" stroke="currentColor" stroke-opacity="0.25" stroke-width="2" stroke-linecap="round"/>
+            <path d="M124 44h32" stroke="currentColor" stroke-opacity="0.45" stroke-width="1.5" stroke-dasharray="3 3"/>
+            <rect x="162" y="16" width="96" height="56" rx="8" stroke="currentColor" stroke-opacity="0.55" stroke-width="1.5" fill="currentColor" fill-opacity="0.08"/>
+            <circle cx="186" cy="44" r="12" stroke="currentColor" stroke-opacity="0.6" stroke-width="1.5"/>
+            <path d="M210 38h32M210 50h22" stroke="currentColor" stroke-opacity="0.45" stroke-width="2" stroke-linecap="round"/>
+          </svg>`,
+      p4: `<svg class="w-full h-full opacity-75" viewBox="0 0 280 88" fill="none">
+            <g fill="currentColor">
+              <circle cx="88" cy="26" r="4" fill-opacity="0.8"/><circle cx="104" cy="26" r="4" fill-opacity="0.25"/>
+              <circle cx="88" cy="44" r="4" fill-opacity="0.8"/><circle cx="104" cy="44" r="4" fill-opacity="0.8"/>
+              <circle cx="88" cy="62" r="4" fill-opacity="0.25"/><circle cx="104" cy="62" r="4" fill-opacity="0.25"/>
+              <circle cx="136" cy="26" r="4" fill-opacity="0.8"/><circle cx="152" cy="26" r="4" fill-opacity="0.8"/>
+              <circle cx="136" cy="44" r="4" fill-opacity="0.25"/><circle cx="152" cy="44" r="4" fill-opacity="0.8"/>
+              <circle cx="136" cy="62" r="4" fill-opacity="0.8"/><circle cx="152" cy="62" r="4" fill-opacity="0.25"/>
+              <circle cx="184" cy="26" r="4" fill-opacity="0.8"/><circle cx="200" cy="26" r="4" fill-opacity="0.25"/>
+              <circle cx="184" cy="44" r="4" fill-opacity="0.25"/><circle cx="200" cy="44" r="4" fill-opacity="0.8"/>
+              <circle cx="184" cy="62" r="4" fill-opacity="0.8"/><circle cx="200" cy="62" r="4" fill-opacity="0.8"/>
+            </g>
+          </svg>`
+    };
+
+    const DEFAULT_DATA = {
+      profile: {
+        name: 'Yassin Mohamed',
+        role: 'Software Engineer · Backend & Full-Stack',
+        status: 'Open to Software Engineering Roles',
+        bio: 'Software Engineer with nearly 3 years of experience at Amazon specializing in large-scale automation and cloud-based fulfillment technologies—including an inventory defect resolution initiative that saved over $80M annually. Proficient across Java/Spring, TypeScript, Angular, React, Node.js, and AWS.',
+        location: 'Toronto, Ontario',
+        experience: '3+ Years (Amazon)',
+        stack: 'Java, TS & AWS',
+        availability: '$80M+ Annual Savings',
+        email: 'yassinmmoussa@gmail.com',
+        phone: '(647) 919-2182',
+        github: 'https://github.com',
+        linkedin: 'https://linkedin.com'
+      },
+      projects: [
+        {
+          id: 'p1',
+          title: 'Automated Inventory Defect Resolution',
+          category: 'Backend & Cloud',
+          metric: '$80M+ / yr saved',
+          blurb: 'Large-scale Java & Spring automation platform eliminating inventory defects across Amazon fulfillment.',
+          summary: 'Contributed significantly to the architecture, design, and end-to-end implementation of a large-scale automation system built with Lombok on Java servers leveraging the Spring framework. Gathered business requirements from internal and external stakeholders and translated them into maintainable technical specifications.',
+          impact: 'Saved over $80M annually across Amazon Fulfillment Technologies.',
+          tags: ['Java', 'Spring', 'Lombok', 'AWS', 'CI/CD'],
+          tone: 'text-indigo-400 bg-indigo-500/[0.06] border-indigo-500/20'
+        },
+        {
+          id: 'p2',
+          title: 'Global Inventory Resolution System',
+          category: 'Backend & Cloud',
+          metric: '~170k req / min',
+          blurb: 'Core process enhancements for a high-throughput distributed system handling ~170k requests/min.',
+          summary: 'Owned the full development lifecycle—scoping, design, implementation, end-to-end integration testing, and containerized deployment—for multiple initiatives enhancing core processes within a high-volume global inventory resolution platform.',
+          impact: 'Operated reliably at ~170k requests/min with fully integrated CI/CD and containerized deployments.',
+          tags: ['Java', 'Spring', 'Docker', 'Kubernetes', 'CI/CD'],
+          tone: 'text-cyan-400 bg-cyan-500/[0.06] border-cyan-500/20'
+        },
+        {
+          id: 'p3',
+          title: 'Financial Matchmaking Platform & LMS',
+          category: 'Full-Stack',
+          metric: 'Production Ready',
+          blurb: 'Core platform features, bug fixes, and Loan Management System architecture evaluation at Qardy.',
+          summary: 'Contributed as a Remote Fullstack Engineer building new data views and optimizing performance using Angular, Node.js/Express, and MongoDB/Mongoose. Initiated technical evaluation of open-source Loan Management Systems (LMS) for a proprietary lending product.',
+          impact: 'Improved platform stability toward production readiness and defined technical direction for a new lending product.',
+          tags: ['Angular', 'TypeScript', 'Node.js', 'Express', 'MongoDB'],
+          tone: 'text-emerald-400 bg-emerald-500/[0.06] border-emerald-500/20'
+        },
+        {
+          id: 'p4',
+          title: 'Braille Learning Toy & Scenario GUI',
+          category: 'Embedded & Desktop',
+          metric: 'Raspberry Pi + Swing',
+          blurb: 'Interactive Raspberry Pi Braille-teaching toy and Java Swing branching scenario studio at PiET Lab.',
+          summary: 'Served as primary software developer at York University PiET Lab, building Java simulation software to chart hardware development progress and a Java Swing scripting GUI for authoring branching learning scenarios loaded onto the Raspberry Pi device.',
+          impact: 'Led end-to-end software architecture and scenario authoring tools for visually impaired learners.',
+          tags: ['Java', 'Java Swing', 'Raspberry Pi', 'OOP'],
+          tone: 'text-amber-400 bg-amber-500/[0.06] border-amber-500/20'
+        }
+      ],
+      experience: [
+        {
+          role: 'Fullstack Engineer - Remote (Contract)',
+          company: 'Qardy E-Payment Solutions',
+          period: 'Oct 2025 – Apr 2026',
+          location: 'Cairo, Egypt (Remote)',
+          bullets: [
+            'Contributed to core platform development of a financial matchmaking service using Angular on the front end and Node.js/Express with MongoDB/Mongoose on the back end.',
+            'Engineered critical feature requests (such as additional data views) and resolved bugs supporting platform stability and production readiness.',
+            'Initiated technical research and evaluation of open-source Loan Management Systems (LMS) to guide a new proprietary lending product.'
+          ]
+        },
+        {
+          role: 'Technical Upskilling & Independent Study',
+          company: 'Independent Technical Residency',
+          period: 'Oct 2024 – Oct 2025',
+          location: 'Toronto, ON',
+          bullets: [
+            'Dedicated 12 months to an intensive technical residency specializing in modern full-stack technologies and software architecture.',
+            'Built production-ready feature sets and performance optimization exercises across Angular, React, Node.js, Express, and MongoDB.',
+            'Strengthened proficiency in MVC design patterns, complex data modeling, and modern Git workflows.'
+          ]
+        },
+        {
+          role: 'Software Development Engineer',
+          company: 'Amazon Development Centre Canada ULC – Fulfillment Technologies',
+          period: 'Feb 2022 – Oct 2024',
+          location: 'Toronto, ON',
+          bullets: [
+            'Contributed to the architecture, design, and implementation of a large-scale Java/Spring automation project (with Lombok) targeting inventory defects, saving over $80M annually.',
+            'Owned the full development lifecycle for multiple initiatives in a high-volume (~170k requests/min) global inventory resolution system using CI/CD and containerized deployments.',
+            'Provided thorough design and code reviews on architecture, performance, integration testing, and security compliance, and contributed as an "away developer" on newer AWS services.'
+          ]
+        },
+        {
+          role: 'Software Developer',
+          company: 'PiET Lab, York University',
+          period: 'Sep 2018 – May 2019',
+          location: 'Toronto, ON',
+          bullets: [
+            'Served as primary software developer for an interactive Raspberry Pi-based consumer toy teaching visually impaired children to read Braille.',
+            'Developed Java simulation software to chart hardware progress and a Java Swing scripting GUI for creating branching learning scenarios.'
+          ]
+        }
+      ],
+      skills: [
+        { group: 'Languages', items: ['Java', 'TypeScript', 'JavaScript', 'Python', 'Ruby', 'SQL', 'HTML', 'CSS', 'C', 'C++', 'Verilog', 'MATLAB'] },
+        { group: 'Frontend & Backend', items: ['React', 'Angular', 'Redux', 'Tailwind CSS', 'Bootstrap', 'Spring', 'Node.js', 'Express', 'Flask', 'REST APIs', 'GraphQL', 'PassportJS', 'Mongoose', 'MongoDB', 'IBM DB2'] },
+        { group: 'Cloud, DevOps & OS', items: ['AWS (EC2, S3, Lambda)', 'GCP', 'Heroku', 'Docker', 'Kubernetes', 'CI/CD Pipelines', 'GitHub Actions', 'Jenkins', 'Bamboo', 'Git', 'Apache / Tomcat', 'Linux'] }
+      ]
+    };
+
+    let state = loadState();
+    let activeCategory = 'All';
+
+    function loadState() {
+      try {
+        const saved = localStorage.getItem('portfolio_state_v3_yassin');
+        if (saved) return JSON.parse(saved);
+      } catch (_) {}
+      return JSON.parse(JSON.stringify(DEFAULT_DATA));
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem('portfolio_state_v3_yassin', JSON.stringify(state));
+      } catch (_) {}
+    }
+
+    function getInitials(name) {
+      return (name || 'YM').trim().split(/\s+/).slice(0, 2).map(w => w[0]?.toUpperCase() || '').join('') || 'YM';
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.remove('hidden');
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => toast.classList.add('hidden'), 2400);
+    }
+
+    function copyEmail() {
+      const email = state.profile.email;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(email).then(() => showToast('Email copied: ' + email)).catch(() => fallbackCopy(email));
+      } else {
+        fallbackCopy(email);
+      }
+    }
+
+    function fallbackCopy(text) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        showToast('Email copied: ' + text);
+      } catch (_) {
+        showToast('Email: ' + text);
+      }
+      document.body.removeChild(ta);
+    }
+
+    function renderProfile() {
+      const p = state.profile;
+      document.title = `${p.name} — ${p.role}`;
+      document.getElementById('nav-initials').textContent = getInitials(p.name);
+      document.getElementById('nav-name').textContent = p.name;
+      document.getElementById('hero-status').textContent = p.status;
+      document.getElementById('hero-location-badge').textContent = p.location;
+      document.getElementById('hero-name').textContent = p.name;
+      document.getElementById('hero-role').textContent = p.role;
+      document.getElementById('hero-bio').textContent = p.bio;
+      document.getElementById('hero-email-label').textContent = p.email;
+      document.getElementById('stat-location').textContent = p.location;
+      document.getElementById('stat-experience').textContent = p.experience;
+      document.getElementById('stat-stack').textContent = p.stack;
+      document.getElementById('stat-availability').textContent = p.availability;
+      document.getElementById('link-github').href = p.github || 'https://github.com';
+      document.getElementById('link-linkedin').href = p.linkedin || 'https://linkedin.com';
+      document.getElementById('contact-mailto').href = 'mailto:' + p.email;
+      document.getElementById('contact-email-text').textContent = p.email;
+      document.getElementById('contact-phone-text').textContent = p.phone;
+      document.getElementById('footer-text').textContent = `${p.name} · ${p.location}`;
+    }
+
+    function renderFilters() {
+      const categories = ['All', ...new Set(state.projects.map(p => p.category))];
+      const container = document.getElementById('project-filters');
+      container.innerHTML = categories.map(cat => {
+        const active = cat === activeCategory;
+        return `<button type="button" data-cat="${cat}" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+          active
+            ? 'bg-indigo-600 text-white'
+            : 'bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.08] text-slate-600 dark:text-slate-400 hover:border-indigo-400/50 hover:text-slate-900 dark:hover:text-slate-200'
+        }">${cat}</button>`;
+      }).join('');
+    }
+
+    function renderProjects() {
+      const grid = document.getElementById('projects-grid');
+      const list = activeCategory === 'All'
+        ? state.projects
+        : state.projects.filter(p => p.category === activeCategory);
+
+      grid.innerHTML = list.map(proj => `
+        <article data-id="${proj.id}" tabindex="0" role="button"
+          class="project-card group cursor-pointer rounded-2xl bg-white dark:bg-[#111724] border border-slate-200/90 dark:border-white/[0.07] overflow-hidden hover:border-indigo-500/50 dark:hover:bg-[#151C2C] transition-all flex flex-col">
+          <div class="h-28 px-4 pt-3 pb-2 border-b border-slate-100 dark:border-white/[0.05] flex flex-col justify-between ${proj.tone || 'text-indigo-400 bg-indigo-500/[0.06]'}">
+            <div class="flex items-center justify-between gap-2">
+              <span class="px-2.5 py-0.5 rounded-md text-[11px] font-mono font-medium bg-white/70 dark:bg-[#0B0F17]/70 border border-current/20">${proj.category}</span>
+              <span class="text-[11px] font-mono font-semibold opacity-90">${proj.metric || ''}</span>
+            </div>
+            <div class="h-16 w-full flex items-center justify-center">
+              ${PROJECT_DIAGRAMS[proj.id] || ''}
+            </div>
+          </div>
+          <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
+            <div>
+              <div class="flex items-center justify-between gap-2">
+                <h3 class="font-semibold text-base text-slate-900 dark:text-slate-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-300 transition-colors">${proj.title}</h3>
+                <svg class="w-4 h-4 text-slate-400 group-hover:text-indigo-400 group-hover:translate-x-0.5 transition-all shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </div>
+              <p class="text-sm text-slate-600 dark:text-slate-400 mt-1.5 leading-relaxed">${proj.blurb}</p>
+            </div>
+            <div class="flex flex-wrap gap-1.5">
+              ${proj.tags.map(t => `<span class="px-2 py-0.5 rounded-md text-xs font-mono bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">${t}</span>`).join('')}
+            </div>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    function renderExperience() {
+      const container = document.getElementById('experience-list');
+      container.innerHTML = state.experience.map((item, idx) => `
+        <div class="relative sm:pl-10">
+          <span class="hidden sm:flex absolute left-[9px] top-6 w-3.5 h-3.5 rounded-full border-2 ${idx === 0 ? 'bg-indigo-500 border-indigo-300/60 shadow-sm shadow-indigo-500/50' : 'bg-[#0B0F17] border-slate-400 dark:border-slate-600'}"></span>
+          <div class="p-5 sm:p-6 rounded-2xl bg-white dark:bg-[#111724] border border-slate-200/90 dark:border-white/[0.07] hover:dark:border-white/[0.12] transition-colors space-y-3">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+              <div>
+                <h3 class="font-semibold text-base text-slate-900 dark:text-slate-100">${item.role}</h3>
+                <div class="text-sm text-indigo-600 dark:text-indigo-400 font-medium mt-0.5">${item.company} · <span class="text-slate-500 dark:text-slate-400 font-normal">${item.location}</span></div>
+              </div>
+              <span class="text-xs font-mono px-2.5 py-1 rounded-md bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.07] text-slate-600 dark:text-slate-300 self-start sm:self-center shrink-0">${item.period}</span>
+            </div>
+            <ul class="space-y-1.5 text-sm text-slate-600 dark:text-slate-300/90 list-disc pl-5 leading-relaxed">
+              ${item.bullets.map(b => `<li>${b}</li>`).join('')}
+            </ul>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderSkills() {
+      const container = document.getElementById('skills-grid');
+      container.innerHTML = state.skills.map(sec => `
+        <div class="p-5 rounded-2xl bg-white dark:bg-[#111724] border border-slate-200/90 dark:border-white/[0.07] space-y-3">
+          <h3 class="font-semibold text-sm text-slate-900 dark:text-slate-100">${sec.group}</h3>
+          <div class="flex flex-wrap gap-2">
+            ${sec.items.map(skill => `<span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">${skill}</span>`).join('')}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function openProjectModal(id) {
+      const proj = state.projects.find(p => p.id === id);
+      if (!proj) return;
+      document.getElementById('modal-category').textContent = proj.category;
+      document.getElementById('modal-title').textContent = proj.title;
+      document.getElementById('modal-summary').textContent = proj.summary;
+      document.getElementById('modal-impact').textContent = proj.impact;
+      document.getElementById('modal-tags').innerHTML = proj.tags
+        .map(t => `<span class="px-2.5 py-1 rounded-md text-xs font-mono bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.06] text-slate-700 dark:text-slate-300">${t}</span>`)
+        .join('');
+      const modal = document.getElementById('project-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeProjectModal() {
+      const modal = document.getElementById('project-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function syncEditorInputs() {
+      const p = state.profile;
+      document.getElementById('input-name').value = p.name;
+      document.getElementById('input-role').value = p.role;
+      document.getElementById('input-status').value = p.status;
+      document.getElementById('input-bio').value = p.bio;
+      document.getElementById('input-location').value = p.location;
+      document.getElementById('input-exp').value = p.experience;
+      document.getElementById('input-email').value = p.email;
+      document.getElementById('input-phone').value = p.phone;
+      document.getElementById('input-github').value = p.github;
+      document.getElementById('input-linkedin').value = p.linkedin;
+    }
+
+    function downloadHtml() {
+      const clone = document.documentElement.cloneNode(true);
+      clone.querySelectorAll('#editor-drawer, #project-modal, #toast').forEach(el => el.classList.add('hidden'));
+      const html = '<!DOCTYPE html>\n' + clone.outerHTML;
+      const blob = new Blob([html], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'index.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('Downloaded index.html');
+    }
+
+    function renderAll() {
+      renderProfile();
+      renderFilters();
+      renderProjects();
+      renderExperience();
+      renderSkills();
+    }
+
+    // Event Listeners
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+      document.documentElement.classList.toggle('dark');
+    });
+
+    document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+      document.getElementById('mobile-menu').classList.toggle('hidden');
+    });
+
+    document.querySelectorAll('#mobile-menu a').forEach(link => {
+      link.addEventListener('click', () => {
+        document.getElementById('mobile-menu').classList.add('hidden');
+      });
+    });
+
+    document.getElementById('copy-email-hero').addEventListener('click', copyEmail);
+    document.getElementById('copy-email-footer').addEventListener('click', copyEmail);
+
+    document.getElementById('project-filters').addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-cat]');
+      if (!btn) return;
+      activeCategory = btn.dataset.cat;
+      renderFilters();
+      renderProjects();
+    });
+
+    document.getElementById('projects-grid').addEventListener('click', (e) => {
+      const card = e.target.closest('.project-card');
+      if (card) openProjectModal(card.dataset.id);
+    });
+
+    document.getElementById('projects-grid').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        const card = e.target.closest('.project-card');
+        if (card) {
+          e.preventDefault();
+          openProjectModal(card.dataset.id);
+        }
+      }
+    });
+
+    document.getElementById('close-modal-btn').addEventListener('click', closeProjectModal);
+    document.getElementById('project-modal').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) closeProjectModal();
+    });
+
+    document.getElementById('open-editor-btn').addEventListener('click', () => {
+      syncEditorInputs();
+      const drawer = document.getElementById('editor-drawer');
+      drawer.classList.remove('hidden');
+      drawer.classList.add('flex');
+    });
+
+    document.getElementById('close-editor-btn').addEventListener('click', () => {
+      const drawer = document.getElementById('editor-drawer');
+      drawer.classList.add('hidden');
+      drawer.classList.remove('flex');
+    });
+
+    document.getElementById('editor-drawer').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) {
+        e.currentTarget.classList.add('hidden');
+        e.currentTarget.classList.remove('flex');
+      }
+    });
+
+    const fieldMap = {
+      'input-name': 'name',
+      'input-role': 'role',
+      'input-status': 'status',
+      'input-bio': 'bio',
+      'input-location': 'location',
+      'input-exp': 'experience',
+      'input-email': 'email',
+      'input-phone': 'phone',
+      'input-github': 'github',
+      'input-linkedin': 'linkedin'
+    };
+
+    Object.entries(fieldMap).forEach(([inputId, key]) => {
+      document.getElementById(inputId).addEventListener('input', (e) => {
+        state.profile[key] = e.target.value;
+        saveState();
+        renderProfile();
+      });
+    });
+
+    document.getElementById('reset-data-btn').addEventListener('click', () => {
+      state = JSON.parse(JSON.stringify(DEFAULT_DATA));
+      saveState();
+      syncEditorInputs();
+      renderAll();
+      showToast('Reset to Yassin Mohamed portfolio');
+    });
+
+    document.getElementById('download-html-btn').addEventListener('click', downloadHtml);
+
+    renderAll();
+  </script>
+
+</body></html>
