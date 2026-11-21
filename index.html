@@ -879,11 +879,6 @@ url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMExce
           <svg id="icon-moon" class="w-4 h-4 block dark:hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
         </button>
 
-        <button id="open-editor-btn" type="button" class="px-3 py-2 rounded-lg text-xs sm:text-sm font-medium bg-indigo-600 hover:bg-indigo-500 text-white shadow-sm shadow-indigo-950/30 transition-colors flex items-center gap-1.5">
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-          <span>Customize</span>
-        </button>
-
         <button id="mobile-menu-btn" type="button" aria-label="Toggle menu" class="md:hidden p-2 rounded-lg border border-slate-200 dark:border-white/[0.08] text-slate-600 dark:text-slate-300">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"></path></svg>
         </button>
@@ -1279,74 +1274,6 @@ url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMExce
     </div>
   </div>
 
-  <!-- Customize Drawer -->
-  <div id="editor-drawer" class="no-print fixed inset-0 z-50 justify-end bg-black/60 backdrop-blur-sm flex hidden">
-    <div class="bg-white dark:bg-[#101623] border-l border-slate-200 dark:border-white/[0.08] w-full max-w-md h-full flex flex-col shadow-2xl">
-      <div class="p-5 border-b border-slate-200 dark:border-white/[0.08] flex items-center justify-between">
-        <div>
-          <h3 class="font-bold text-base text-slate-900 dark:text-slate-100">Customize Your Portfolio</h3>
-          <p class="text-xs text-slate-500 dark:text-slate-400">Add your GitHub/LinkedIn links or tweak details, then download.</p>
-        </div>
-        <button id="close-editor-btn" type="button" aria-label="Close editor" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg>
-        </button>
-      </div>
-
-      <form id="editor-form" class="p-5 space-y-4 overflow-y-auto flex-1 text-sm">
-        <div>
-          <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Full Name</label>
-          <input id="input-name" type="text" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-white/[0.1] bg-white dark:bg-[#0B0F17] text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Target Role / Headline</label>
-          <input id="input-role" type="text" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-white/[0.1] bg-white dark:bg-[#0B0F17] text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Status Badge</label>
-          <input id="input-status" type="text" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-white/[0.1] bg-white dark:bg-[#0B0F17] text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Short Bio</label>
-          <textarea id="input-bio" rows="4" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-white/[0.1] bg-white dark:bg-[#0B0F17] text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
-        </div>
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Location</label>
-            <input id="input-location" type="text" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-white/[0.1] bg-white dark:bg-[#0B0F17] text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-          </div>
-          <div>
-            <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Experience</label>
-            <input id="input-exp" type="text" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-white/[0.1] bg-white dark:bg-[#0B0F17] text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-          </div>
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Email</label>
-          <input id="input-email" type="email" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-white/[0.1] bg-white dark:bg-[#0B0F17] text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Phone</label>
-          <input id="input-phone" type="text" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-white/[0.1] bg-white dark:bg-[#0B0F17] text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">GitHub URL</label>
-          <input id="input-github" type="url" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-white/[0.1] bg-white dark:bg-[#0B0F17] text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">LinkedIn URL</label>
-          <input id="input-linkedin" type="url" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-white/[0.1] bg-white dark:bg-[#0B0F17] text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-        </div>
-      </form>
-
-      <div class="p-5 border-t border-slate-200 dark:border-white/[0.08] flex items-center justify-between gap-3 bg-slate-50 dark:bg-[#0B0F17]">
-        <button id="reset-data-btn" type="button" class="px-3 py-2 rounded-lg border border-slate-300 dark:border-white/[0.1] text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/[0.06]">
-          Reset
-        </button>
-        <button id="download-html-btn" type="button" class="flex-1 px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium transition-colors">
-          Download index.html
-        </button>
-      </div>
-    </div>
-  </div>
 
   <!-- Toast Notification -->
   <div id="toast" class="no-print fixed bottom-5 right-5 z-50 hidden px-4 py-2.5 rounded-xl bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 text-sm font-medium shadow-lg"></div>
@@ -1407,8 +1334,8 @@ url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMExce
         availability: '$80M+ Annual Savings',
         email: 'yassinmmoussa@gmail.com',
         phone: '(647) 919-2182',
-        github: 'https://github.com',
-        linkedin: 'https://linkedin.com'
+        github: 'https://github.com/yassinmmoussa',
+        linkedin: 'https://linkedin.com/in/yassin-moussa/'
       },
       projects: [
         {
